@@ -85,6 +85,7 @@ class Server:
                     thread = threading.Thread(target=self.__user_thread, args=(len(self.__connections) - 1,))
                     thread.setDaemon(True)
                     thread.start()
+                    break
                 else:
                     print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
         except Exception:
