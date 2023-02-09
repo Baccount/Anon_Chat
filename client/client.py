@@ -7,14 +7,14 @@ import socks
 
 class Client(Cmd):
     """
-    客户端
+    client
     """
     prompt = ''
-    intro = '[Welcome] 简易聊天室客户端(Cli版)\n' + '[Welcome] 输入help来获取帮助\n'
+    intro = '[Welcome] Simple chat room client (Cli version)\n' + '[Welcome] Type help to get help\n'
 
     def __init__(self):
         """
-        构造
+        structure
         """
         super().__init__()
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
@@ -26,7 +26,7 @@ class Client(Cmd):
 
     def __receive_message_thread(self):
         """
-        接受消息线程
+        accept message thread
         """
         while self.__isLogin:
             # noinspection PyBroadException
@@ -35,12 +35,12 @@ class Client(Cmd):
                 obj = json.loads(buffer)
                 print('[' + str(obj['sender_nickname']) + '(' + str(obj['sender_id']) + ')' + ']', obj['message'])
             except Exception:
-                print('[Client] 无法从服务器获取数据')
+                print('[Client] Unable to get data from server')
 
     def __send_message_thread(self, message):
         """
-        发送消息线程
-        :param message: 消息内容
+        send message thread
+        :param message: Message content
         """
         self.__socket.send(json.dumps({
             'type': 'broadcast',
@@ -50,7 +50,7 @@ class Client(Cmd):
 
     def start(self):
         """
-        启动客户端
+        start the client
         """
         onion = input("Enter your onion address: ")
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
@@ -61,18 +61,18 @@ class Client(Cmd):
 
     def do_login(self, args):
         """
-        登录聊天室
-        :param args: 参数
+        login chat room
+        :param args: parameter
         """
         nickname = args.split(' ')[0]
 
-        # 将昵称发送给服务器，获取用户id
+        # Send the nickname to the server to get the user id
         self.__socket.send(json.dumps({
             'type': 'login',
             'nickname': nickname
         }).encode())
-        # 尝试接受数据
-        # noinspection PyBroadException
+
+
         try:
             buffer = self.__socket.recv(1024).decode()
             obj = json.loads(buffer)
@@ -80,34 +80,34 @@ class Client(Cmd):
                 self.__nickname = nickname
                 self.__id = obj['id']
                 self.__isLogin = True
-                print('[Client] 成功登录到聊天室')
+                print('[Client] Successfully logged into the chat room')
 
-                # 开启子线程用于接受数据
+
                 thread = threading.Thread(target=self.__receive_message_thread)
                 thread.setDaemon(True)
                 thread.start()
             else:
-                print('[Client] 无法登录到聊天室')
+                print('[Client] Cant log in to the chat room')
         except Exception:
-            print('[Client] 无法从服务器获取数据')
+            print('[Client] Unable to get data from server')
 
     def do_send(self, args):
         """
-        发送消息
-        :param args: 参数
+        Send a message
+        :param args: parameter
         """
         message = args
-        # 显示自己发送的消息
+        # Show messages sent by yourself
         print('[' + str(self.__nickname) + '(' + str(self.__id) + ')' + ']', message)
-        # 开启子线程用于发送数据
+        # Open child thread for sending data
         thread = threading.Thread(target=self.__send_message_thread, args=(message,))
         thread.setDaemon(True)
         thread.start()
 
     def do_logout(self, args=None):
         """
-        登出
-        :param args: 参数
+        Sign out
+        :param args: parameter
         """
         self.__socket.send(json.dumps({
             'type': 'logout',
@@ -118,19 +118,19 @@ class Client(Cmd):
 
     def do_help(self, arg):
         """
-        帮助
-        :param arg: 参数
+        help
+        :param arg: parameter
         """
         command = arg.split(' ')[0]
         if command == '':
-            print('[Help] login nickname - 登录到聊天室，nickname是你选择的昵称')
-            print('[Help] send message - 发送消息，message是你输入的消息')
-            print('[Help] logout - 退出聊天室')
+            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
+            print('[Help] send message - Send a message, message is the message you entered')
+            print('[Help] logout - exit chat room')
         elif command == 'login':
-            print('[Help] login nickname - 登录到聊天室，nickname是你选择的昵称')
+            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
         elif command == 'send':
-            print('[Help] send message - 发送消息，message是你输入的消息')
+            print('[Help] send message - Send a message, message is the message you entered')
         elif command == 'logout':
-            print('[Help] logout - 退出聊天室')
+            print('[Help] logout - exit chat room')
         else:
-            print('[Help] 没有查询到你想要了解的指令')
+            print('[Help] The command you want to know is not found')
