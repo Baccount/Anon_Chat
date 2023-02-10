@@ -84,7 +84,7 @@ class Client(Cmd):
         try:
             buffer = self.__socket.recv(1024).decode()
             obj = json.loads(buffer)
-            if obj['id'] and obj['id'] != -1:
+            if obj['id']:
                 self.__nickname = nickname
                 self.__id = obj['id']
                 self.__isLogin = True
@@ -94,8 +94,6 @@ class Client(Cmd):
                 thread = threading.Thread(target=self.__receive_message_thread)
                 thread.setDaemon(True)
                 thread.start()
-            else:
-                print('User name already exists, please choose another user name')
         except Exception as e:
             print(e)
 
