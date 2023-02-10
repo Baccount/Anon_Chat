@@ -68,6 +68,14 @@ class Server:
                     'message': message
                 }).encode())
 
+    def check_duplicate_nickname(self, nickname):
+        '''
+        check if nickname is already taken
+        '''
+        for nick in self.__nicknames:
+            if nick == nickname:
+                return True
+        return False
     def __waitForLogin(self, connection):
         # try to accept data
         # noinspection PyBroadException
@@ -77,20 +85,27 @@ class Server:
                 # parsed into json data
                 obj = json.loads(buffer)
                 # If it is a connection command, then return a new user number to receive the user connection
-                if obj['type'] == 'login':
+                # If the nickname is already taken, then return a -1
+                if obj['type'] == 'login' and obj['nickname'] not in self.__nicknames:
                     self.__connections.append(connection)
                     self.__nicknames.append(obj['nickname'])
                     connection.send(json.dumps({
                         'id': len(self.__connections) - 1
                     }).encode())
-
                     # start a new thread
                     thread = threading.Thread(target=self.__user_thread, args=(len(self.__connections) - 1,))
                     thread.setDaemon(True)
                     thread.start()
                     break
+
+
+
                 else:
-                    print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
+                    # send a -1 message to the client to indicate that the nickname is already taken
+                    print('[Server] nickname already taken' + obj['nickname'])
+                    connection.send(json.dumps({
+                        'id': -1
+                    }).encode())
         except Exception:
             print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
 

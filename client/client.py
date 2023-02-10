@@ -83,7 +83,7 @@ class Client(Cmd):
         try:
             buffer = self.__socket.recv(1024).decode()
             obj = json.loads(buffer)
-            if obj['id']:
+            if obj['id'] and obj['id'] != -1:
                 self.__nickname = nickname
                 self.__id = obj['id']
                 self.__isLogin = True
@@ -94,9 +94,9 @@ class Client(Cmd):
                 thread.setDaemon(True)
                 thread.start()
             else:
-                print('[Client] Cant log in to the chat room')
-        except Exception:
-            print('[Client] Unable to get data from server')
+                print('User name already exists, please choose another user name')
+        except Exception as e:
+            print(e)
 
     def do_send(self, args):
         """
