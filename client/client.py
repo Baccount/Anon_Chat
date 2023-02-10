@@ -33,9 +33,15 @@ class Client(Cmd):
             try:
                 buffer = self.__socket.recv(1024).decode()
                 obj = json.loads(buffer)
-                print('[' + str(obj['sender_nickname']) + '(' + str(obj['sender_id']) + ')' + ']', obj['message'])
-            except Exception:
-                print('[Client] Unable to get data from server')
+                print('[' + str(obj['sender_nickname']) + ']', obj['message'])
+            except BrokenPipeError as e:
+                print('[Client] Connection to the server was broken', e)
+                self.__isLogin = False
+                break
+            except Exception as e:
+                print('[Client] Unable to get data from server', e)
+                self.__isLogin = False
+                break
 
     def __send_message_thread(self, message):
         """
@@ -57,6 +63,7 @@ class Client(Cmd):
         socket.socket = socks.socksocket
         server = (onion, 80)
         self.__socket.connect(server)
+        # run cmdloop with the folling arguments
         self.cmdloop()
 
     def do_login(self, args):
@@ -65,6 +72,7 @@ class Client(Cmd):
         :param args: parameter
         """
         nickname = args.split(' ')[0]
+
 
         # Send the nickname to the server to get the user id
         self.__socket.send(json.dumps({
@@ -76,7 +84,7 @@ class Client(Cmd):
         try:
             buffer = self.__socket.recv(1024).decode()
             obj = json.loads(buffer)
-            if obj['id']:
+            if obj['id'] and obj['id'] != -1:
                 self.__nickname = nickname
                 self.__id = obj['id']
                 self.__isLogin = True
@@ -87,18 +95,18 @@ class Client(Cmd):
                 thread.setDaemon(True)
                 thread.start()
             else:
-                print('[Client] Cant log in to the chat room')
-        except Exception:
-            print('[Client] Unable to get data from server')
+                print('User name already exists, please choose another user name')
+        except Exception as e:
+            print(e)
 
-    def do_send(self, args):
+    def do_s(self, args):
         """
         Send a message
         :param args: parameter
         """
         message = args
         # Show messages sent by yourself
-        print('[' + str(self.__nickname) + '(' + str(self.__id) + ')' + ']', message)
+        print('[' + str(self.__nickname) + ']', message)
         # Open child thread for sending data
         thread = threading.Thread(target=self.__send_message_thread, args=(message,))
         thread.setDaemon(True)

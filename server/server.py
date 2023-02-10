@@ -1,6 +1,8 @@
 import socket
 import threading
 import json
+from stem.control import Controller
+from random import randint
 
 
 class Server:
@@ -26,14 +28,12 @@ class Server:
         print('[Server] user', user_id, nickname, 'join the chat room')
         self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'join the chat room')
 
-        # 侦听
         while True:
-            # noinspection PyBroadException
             try:
                 buffer = connection.recv(1024).decode()
                 # parsed into json data
                 obj = json.loads(buffer)
-                # If it is a broadcast command
+                # broadcast message
                 if obj['type'] == 'broadcast':
                     self.__broadcast(obj['sender_id'], obj['message'])
                 elif obj['type'] == 'logout':
@@ -45,11 +45,14 @@ class Server:
                     break
                 else:
                     print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
-            except Exception:
-                print('[Server] connection failure:', connection.getsockname(), connection.fileno())
+            except Exception as e:
+                print(e)
                 self.__connections[user_id].close()
+                # remove the user from the list
                 self.__connections[user_id] = None
                 self.__nicknames[user_id] = None
+                # remove the user from the list
+                break
 
     def __broadcast(self, user_id=0, message=''):
         """
@@ -65,6 +68,14 @@ class Server:
                     'message': message
                 }).encode())
 
+    def check_duplicate_nickname(self, nickname):
+        '''
+        check if nickname is already taken
+        '''
+        for nick in self.__nicknames:
+            if nick == nickname:
+                return True
+        return False
     def __waitForLogin(self, connection):
         # try to accept data
         # noinspection PyBroadException
@@ -74,36 +85,50 @@ class Server:
                 # parsed into json data
                 obj = json.loads(buffer)
                 # If it is a connection command, then return a new user number to receive the user connection
-                if obj['type'] == 'login':
+                # If the nickname is already taken, then return a -1
+                if obj['type'] == 'login' and obj['nickname'] not in self.__nicknames:
                     self.__connections.append(connection)
                     self.__nicknames.append(obj['nickname'])
                     connection.send(json.dumps({
                         'id': len(self.__connections) - 1
                     }).encode())
-
                     # start a new thread
                     thread = threading.Thread(target=self.__user_thread, args=(len(self.__connections) - 1,))
                     thread.setDaemon(True)
                     thread.start()
                     break
+
+
+
                 else:
-                    print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
+                    # send a -1 message to the client to indicate that the nickname is already taken
+                    print('[Server] nickname already taken' + obj['nickname'])
+                    connection.send(json.dumps({
+                        'id': -1
+                    }).encode())
         except Exception:
             print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
+
+
+
+
+    def create_onion(self):
+        '''
+        create ephemeral hidden services
+        '''
+        port = randint(10000, 65535)
+        controller = Controller.from_port(port = 9051)
+        controller.authenticate()
+
+        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
+        print(f"Created new hidden service with onion address: {response.service_id}.onion")
+        return port
 
     def start(self):
         """
         start server
         """
-        from stem.control import Controller
-        from random import randint
-        port = randint(10000, 65535)
-        controller = Controller.from_port(port = 9051)
-        controller.authenticate()
-        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
-        print(f"Created new hidden service with onion address: {response.service_id}.onion")
-
-
+        port = self.create_onion()
 
         # bind port
         self.__socket.bind(("127.0.0.1", port))
