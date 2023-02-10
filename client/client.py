@@ -34,8 +34,14 @@ class Client(Cmd):
                 buffer = self.__socket.recv(1024).decode()
                 obj = json.loads(buffer)
                 print('[' + str(obj['sender_nickname']) + '(' + str(obj['sender_id']) + ')' + ']', obj['message'])
-            except Exception:
-                print('[Client] Unable to get data from server')
+            except BrokenPipeError as e:
+                print('[Client] Connection to the server was broken', e)
+                self.__isLogin = False
+                break
+            except Exception as e:
+                print('[Client] Unable to get data from server', e)
+                self.__isLogin = False
+                break
 
     def __send_message_thread(self, message):
         """
