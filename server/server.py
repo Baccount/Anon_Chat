@@ -29,14 +29,12 @@ class Server:
         print('[Server] user', user_id, nickname, 'join the chat room')
         self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'join the chat room')
 
-        # 侦听
         while True:
-            # noinspection PyBroadException
             try:
                 buffer = connection.recv(1024).decode()
                 # parsed into json data
                 obj = json.loads(buffer)
-                # If it is a broadcast command
+                # broadcast message
                 if obj['type'] == 'broadcast':
                     self.__broadcast(obj['sender_id'], obj['message'])
                 elif obj['type'] == 'logout':
@@ -53,6 +51,7 @@ class Server:
                 self.__connections[user_id].close()
                 self.__connections[user_id] = None
                 self.__nicknames[user_id] = None
+                break
 
     def __broadcast(self, user_id=0, message=''):
         """

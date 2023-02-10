@@ -63,6 +63,7 @@ class Client(Cmd):
         socket.socket = socks.socksocket
         server = (onion, 80)
         self.__socket.connect(server)
+        # run cmdloop with the folling arguments
         self.cmdloop()
 
     def do_login(self, args):
