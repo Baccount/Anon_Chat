@@ -3,7 +3,6 @@ import threading
 import json
 from stem.control import Controller
 from random import randint
-import os
 
 
 class Server:
@@ -46,11 +45,13 @@ class Server:
                     break
                 else:
                     print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
-            except Exception:
-                print('[Server] connection failure:', connection.getsockname(), connection.fileno())
+            except Exception as e:
+                print(e)
                 self.__connections[user_id].close()
+                # remove the user from the list
                 self.__connections[user_id] = None
                 self.__nicknames[user_id] = None
+                # remove the user from the list
                 break
 
     def __broadcast(self, user_id=0, message=''):
