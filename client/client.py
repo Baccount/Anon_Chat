@@ -9,7 +9,7 @@ class Client(Cmd):
     """
     client
     """
-    prompt = '>'
+    prompt = ''
     intro = '[Welcome] Simple chat room client (Cli version)\n' + '[Welcome] Type help to get help\n'
 
     def __init__(self):
@@ -71,7 +71,7 @@ class Client(Cmd):
         login chat room
         :param args: parameter
         """
-        nickname = args.split(' ')[0] # remove the > character from the beginning of the string
+        nickname = args.split(' ')[0]
 
 
         # Send the nickname to the server to get the user id
