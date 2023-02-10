@@ -1,6 +1,9 @@
 import socket
 import threading
 import json
+from stem.control import Controller
+from random import randint
+import os
 
 
 class Server:
@@ -91,19 +94,26 @@ class Server:
         except Exception:
             print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
 
+
+
+
+    def create_onion(self):
+        '''
+        create ephemeral hidden services
+        '''
+        port = randint(10000, 65535)
+        controller = Controller.from_port(port = 9051)
+        controller.authenticate()
+
+        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
+        print(f"Created new hidden service with onion address: {response.service_id}.onion")
+        return port
+
     def start(self):
         """
         start server
         """
-        from stem.control import Controller
-        from random import randint
-        port = randint(10000, 65535)
-        controller = Controller.from_port(port = 9051)
-        controller.authenticate()
-        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
-        print(f"Created new hidden service with onion address: {response.service_id}.onion")
-
-
+        port = self.create_onion()
 
         # bind port
         self.__socket.bind(("127.0.0.1", port))
