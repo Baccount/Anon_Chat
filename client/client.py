@@ -9,7 +9,7 @@ class Client(Cmd):
     """
     client
     """
-    prompt = ''
+    prompt = '>'
     intro = '[Welcome] Simple chat room client (Cli version)\n' + '[Welcome] Type help to get help\n'
 
     def __init__(self):
@@ -33,7 +33,7 @@ class Client(Cmd):
             try:
                 buffer = self.__socket.recv(1024).decode()
                 obj = json.loads(buffer)
-                print('[' + str(obj['sender_nickname']) + '(' + str(obj['sender_id']) + ')' + ']', obj['message'])
+                print('[' + str(obj['sender_nickname']) + ']', obj['message'])
             except BrokenPipeError as e:
                 print('[Client] Connection to the server was broken', e)
                 self.__isLogin = False
@@ -71,7 +71,8 @@ class Client(Cmd):
         login chat room
         :param args: parameter
         """
-        nickname = args.split(' ')[0]
+        nickname = args.split(' ')[0] # remove the > character from the beginning of the string
+
 
         # Send the nickname to the server to get the user id
         self.__socket.send(json.dumps({
@@ -98,14 +99,14 @@ class Client(Cmd):
         except Exception as e:
             print(e)
 
-    def do_send(self, args):
+    def do_s(self, args):
         """
         Send a message
         :param args: parameter
         """
         message = args
         # Show messages sent by yourself
-        print('[' + str(self.__nickname) + '(' + str(self.__id) + ')' + ']', message)
+        print('[' + str(self.__nickname) + ']', message)
         # Open child thread for sending data
         thread = threading.Thread(target=self.__send_message_thread, args=(message,))
         thread.setDaemon(True)
