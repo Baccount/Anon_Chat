@@ -26,11 +26,13 @@ class Server:
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
         print('[Server] user', user_id, nickname, 'join the chat room')
-        self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
+        # self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
+        connection.se
 
         while True:
             try:
                 buffer = connection.recv(1024).decode()
+                print(buffer)
                 # parsed into json data
                 obj = json.loads(buffer)
                 # broadcast message
@@ -46,6 +48,7 @@ class Server:
                 else:
                     print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
             except Exception as e:
+                print('server line 49')
                 print(e)
                 self.__connections[user_id].close()
                 # remove the user from the list
@@ -74,6 +77,7 @@ class Server:
         try:
             while True:
                 buffer = connection.recv(1024).decode()
+                print(buffer)
                 # parsed into json data
                 obj = json.loads(buffer)
                 # If it is a connection command, then return a new user number to receive the user connection
@@ -90,7 +94,9 @@ class Server:
                     thread.start()
                     break
 
-        except Exception:
+        except Exception as e:
+            print('server line 95')
+            print(e)
             print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
 
 

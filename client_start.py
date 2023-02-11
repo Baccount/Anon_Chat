@@ -1,9 +1,9 @@
-#from client.client import Client
-from download_tor import start
+from client.client import Client
+#from download_tor import start
 
 # downlaod to support work in progress
 
-start("macos")
+#start("macos")
 
 
 
@@ -19,5 +19,5 @@ start("macos")
 
 
 
-# client = Client()
-# client.start()
+client = Client()
+client.start()

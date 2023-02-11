@@ -34,11 +34,8 @@ class Client(Cmd):
                 buffer = self.__socket.recv(1024).decode()
                 obj = json.loads(buffer)
                 print('[' + str(obj['sender_nickname']) + ']', obj['message'])
-            except BrokenPipeError as e:
-                print('[Client] Connection to the server was broken', e)
-                self.__isLogin = False
-                break
             except Exception as e:
+                print('client line 38')
                 print('[Client] Unable to get data from server', e)
                 self.__isLogin = False
                 break
@@ -48,11 +45,15 @@ class Client(Cmd):
         send message thread
         :param message: Message content
         """
-        self.__socket.send(json.dumps({
-            'type': 'broadcast',
-            'sender_id': self.__id,
-            'message': message
-        }).encode())
+        try:
+            self.__socket.send(json.dumps({
+                'type': 'broadcast',
+                'sender_id': self.__id,
+                'message': message
+            }).encode())
+        except Exception as e:
+            print('client line 57')
+            print(e)
 
     def start(self):
         """
@@ -83,6 +84,7 @@ class Client(Cmd):
 
         try:
             buffer = self.__socket.recv(1024).decode()
+            print(buffer)
             obj = json.loads(buffer)
             if obj['id']:
                 self.__nickname = nickname
@@ -95,6 +97,7 @@ class Client(Cmd):
                 thread.setDaemon(True)
                 thread.start()
         except Exception as e:
+            print('client line 98')
             print(e)
 
     def do_s(self, args):
