@@ -46,7 +46,8 @@ class Server:
                     self.__nicknames[user_id] = None
                     break
                 else:
-                    print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
+                    print("Your all ready logged in LINE 49")
+                    break
             except Exception as e:
                 print('server line 49')
                 print(e)

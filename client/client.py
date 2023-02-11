@@ -74,35 +74,38 @@ class Client(Cmd):
         """
         nickname = args.split(' ')[0]
 
-
-        # Send the nickname to the server to get the user id
-        self.__socket.send(json.dumps({
-            'type': 'login',
-            'nickname': nickname
-        }).encode())
-
-
-        try:
-            buffer = self.__socket.recv(1024).decode()
-            print(buffer)
-            obj = json.loads(buffer)
-            if obj['id']:
-                # if id = -1 means the nickname is already in use
-                if obj['id'] == -1:
-                    print('[Client] The nickname is already in use')
-                    return
-                self.__nickname = nickname
-                self.__id = obj['id']
-                self.__isLogin = True
-                print('[Client] Successfully logged into the chat room')
+        # only login once
+        if not self.__isLogin:
+            # Send the nickname to the server to get the user id
+            self.__socket.send(json.dumps({
+                'type': 'login',
+                'nickname': nickname
+            }).encode())
 
 
-                thread = threading.Thread(target=self.__receive_message_thread)
-                thread.setDaemon(True)
-                thread.start()
-        except Exception as e:
-            print('client line 98')
-            print(e)
+            try:
+                buffer = self.__socket.recv(1024).decode()
+                print(buffer)
+                obj = json.loads(buffer)
+                if obj['id']:
+                    # if id = -1 means the nickname is already in use
+                    if obj['id'] == -1:
+                        print('[Client] The nickname is already in use')
+                        return
+                    self.__nickname = nickname
+                    self.__id = obj['id']
+                    self.__isLogin = True
+                    print('[Client] Successfully logged into the chat room')
+
+
+                    thread = threading.Thread(target=self.__receive_message_thread)
+                    thread.setDaemon(True)
+                    thread.start()
+            except Exception as e:
+                print('client line 98')
+                print(e)
+        else:
+            print('[Client] You have already logged in')
 
     def do_s(self, args):
         """
