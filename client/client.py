@@ -33,6 +33,12 @@ class Client(Cmd):
             try:
                 buffer = self.__socket.recv(1024).decode()
                 stripped = self.decode(buffer)
+                if not stripped:
+                    print('[Client] Unable to get data from server LINE 37')
+                    self.__isLogin = False
+                    break
+                    # reset the client
+                print(f"stripped: {stripped}")
                 for i in stripped:
                     obj = json.loads(i)
                     print('[' + str(obj['sender_nickname']) + ']', obj['message'])
@@ -129,8 +135,10 @@ class Client(Cmd):
                     thread.setDaemon(True)
                     thread.start()
             except Exception as e:
-                print('client line 98')
+                print('client line 138')
                 print(e)
+                print("Server likely down")
+                exit(0)
         else:
             print('[Client] You have already logged in')
 

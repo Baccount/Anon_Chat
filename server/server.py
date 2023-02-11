@@ -30,15 +30,25 @@ class Server:
         # self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
 
 
-        try:
-            while True:
+
+        while True:
+            try:
                 buffer = b''
                 chunk = connection.recv(1024)
                 print(f"chunk: {chunk}")
                 if chunk:
                     buffer += chunk
                 else:
+                    # logout the user
+                    print('[Server] user', user_id, nickname, 'exit chat room')
+                    print('[Server] user', user_id, nickname, 'exit chat room')
+                    print('server line 45')
+                    self.__connections[user_id].close()
+                    # remove the user from the list
+                    self.__connections[user_id] = None
+                    self.__nicknames[user_id] = None
                     break
+                                # remove the user from the list
                 # Decode the buffer into a string
                 buffer = buffer.decode()
                 print(f"buffer: {buffer}")
@@ -85,15 +95,15 @@ class Server:
                                 self.__nicknames[user_id] = None
                                 # remove the user from the list
                             break
-        except Exception as e:
-            print('[Server] user', user_id, nickname, 'exit chat room')
-            print('server line 60')
-            print(e)
-            self.__connections[user_id].close()
-            # remove the user from the list
-            self.__connections[user_id] = None
-            self.__nicknames[user_id] = None
-            # remove the user from the list
+            except Exception as e:
+                print('[Server] user', user_id, nickname, 'exit chat room')
+                print('server line 60')
+                print(e)
+                self.__connections[user_id].close()
+                # remove the user from the list
+                self.__connections[user_id] = None
+                self.__nicknames[user_id] = None
+                # remove the user from the list
 
     def __broadcast(self, user_id=0, message=''):
         """
