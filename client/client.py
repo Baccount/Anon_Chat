@@ -37,8 +37,6 @@ class Client(Cmd):
                     print('[Client] Unable to get data from server LINE 37')
                     self.__isLogin = False
                     break
-                    # reset the client
-                print(f"stripped: {stripped}")
                 for i in stripped:
                     obj = json.loads(i)
                     print('[' + str(obj['sender_nickname']) + ']', obj['message'])

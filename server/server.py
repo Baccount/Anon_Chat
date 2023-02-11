@@ -18,6 +18,39 @@ class Server:
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+    def separateJson(self, buffer):
+        objects = []
+        start = 0
+        end = buffer.find('{', start)
+        while end != -1:
+            start = end
+            count = 1
+            end = start + 1
+            while count > 0 and end < len(buffer):
+                if buffer[end] == '{':
+                    count += 1
+                elif buffer[end] == '}':
+                    count -= 1
+                end += 1
+            objects.append(buffer[start:end])
+            start = end
+            end = buffer.find('{', start)
+            # Process each JSON object
+            print(f'objects {objects}')
+            return objects
+
+    def disconnectUsr(self, user_id, nickname):
+        """
+        disconnectUsr
+        """
+        print('[Server] user', user_id, nickname, 'exit chat room')
+        print('server line 45')
+        self.__connections[user_id].close()
+        # remove the user from the list
+        self.__connections[user_id] = None
+        self.__nicknames[user_id] = None
+
+
 
     def __user_thread(self, user_id):
         """
@@ -27,10 +60,6 @@ class Server:
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
         print('[Server] user', user_id, nickname, 'join the chat room')
-        # self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
-
-
-
         while True:
             try:
                 buffer = b''
@@ -39,72 +68,34 @@ class Server:
                 if chunk:
                     buffer += chunk
                 else:
-                    # logout the user
-                    print('[Server] user', user_id, nickname, 'exit chat room')
-                    print('[Server] user', user_id, nickname, 'exit chat room')
-                    print('server line 45')
-                    self.__connections[user_id].close()
-                    # remove the user from the list
-                    self.__connections[user_id] = None
-                    self.__nicknames[user_id] = None
+                    self.disconnectUsr(user_id, nickname)
                     # close the current thread
                     break
-                                # remove the user from the list
                 # Decode the buffer into a string
                 buffer = buffer.decode()
                 print(f"buffer: {buffer}")
                 # Split the buffer into individual JSON objects
-                                # Split the buffer into individual JSON objects
-                objects = []
-                start = 0
-                end = buffer.find('{', start)
-                while end != -1:
-                    start = end
-                    count = 1
-                    end = start + 1
-                    while count > 0 and end < len(buffer):
-                        if buffer[end] == '{':
-                            count += 1
-                        elif buffer[end] == '}':
-                            count -= 1
-                        end += 1
-                    objects.append(buffer[start:end])
-                    start = end
-                    end = buffer.find('{', start)
-                    # Process each JSON object
-                    print(f'objects {objects}')
-                    for obj in objects:
-                        if obj:
-                            # Parse the JSON object
-                            obj = json.loads(obj)
-                                    # Broadcast message
-                            if obj['type'] == 'broadcast':
-                                self.__broadcast(obj['sender_id'], obj['message'])
-                            elif obj['type'] == 'logout':
-                                print('[Server] user', user_id, nickname, 'exit chat room')
-                                self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
-                                self.__connections[user_id].close()
-                                self.__connections[user_id] = None
-                                self.__nicknames[user_id] = None
-                                break
-                            else:
-                                print('[Server] user', user_id, nickname, 'exit chat room')
-                                print('server line 51')
-                                self.__connections[user_id].close()
-                                # remove the user from the list
-                                self.__connections[user_id] = None
-                                self.__nicknames[user_id] = None
-                                # remove the user from the list
+                objects = self.separateJson(buffer)
+                for obj in objects:
+                    if obj:
+                        # Parse the JSON object
+                        obj = json.loads(obj)
+                                # Broadcast message
+                        if obj['type'] == 'broadcast':
+                            self.__broadcast(obj['sender_id'], obj['message'])
+                        elif obj['type'] == 'logout':
+                            self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
+                            self.disconnectUsr(user_id, nickname)
+                            break
+                        else:
+                            print('server line 96')
+                            self.disconnectUsr(user_id, nickname)
                             break
             except Exception as e:
-                print('[Server] user', user_id, nickname, 'exit chat room')
-                print('server line 60')
+                print('server line 97')
                 print(e)
-                self.__connections[user_id].close()
-                # remove the user from the list
-                self.__connections[user_id] = None
-                self.__nicknames[user_id] = None
-                # remove the user from the list
+                self.disconnectUsr(user_id, nickname)
+                break
 
     def __broadcast(self, user_id=0, message=''):
         """
