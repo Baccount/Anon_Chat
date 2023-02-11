@@ -18,7 +18,14 @@ class Server:
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+
     def separateJson(self, buffer):
+        """
+        Separate a buffer of text into individual JSON objects.
+
+        :param buffer: A string buffer containing one or more JSON objects.
+        :return: A list of strings, each representing a separate JSON object.
+        """
         objects = []
         start = 0
         end = buffer.find('{', start)
@@ -41,7 +48,7 @@ class Server:
 
     def disconnectUsr(self, user_id, nickname):
         """
-        disconnectUsr
+        disconnect User
         """
         print('[Server] user', user_id, nickname, 'exit chat room')
         print('server line 45')
@@ -118,16 +125,16 @@ class Server:
             self.__lock.release()
 
     def __waitForLogin(self, connection):
-        # try to accept data
-        # noinspection PyBroadException
+        """
+        Wait for a client to log in and start a new thread for the client.
+
+        :param connection: The connection with the client.
+        """
         try:
             while True:
                 buffer = connection.recv(1024).decode()
                 print(buffer)
-                # parsed into json data
                 obj = json.loads(buffer)
-                # If it is a connection command, then return a new user number to receive the user connection
-                #  and obj['nickname'] not in self.__nicknames
                 if obj['type'] == 'login':
                     # check if the nickname is already in use
                     if obj['nickname'] in self.__nicknames:
@@ -135,19 +142,20 @@ class Server:
                             'id': -1
                         }).encode())
                         continue
+                    # add the connection and nickname to the lists
                     self.__connections.append(connection)
                     self.__nicknames.append(obj['nickname'])
                     connection.send(json.dumps({
                         'id': len(self.__connections) - 1
                     }).encode())
-                    # start a new thread
+                    # start a new thread for the user
                     thread = threading.Thread(target=self.__user_thread, args=(len(self.__connections) - 1,))
                     thread.setDaemon(True)
                     thread.start()
                     break
 
         except Exception as e:
-            print('server line 95')
+            print('server line 158')
             print(e)
             print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
 
@@ -168,23 +176,22 @@ class Server:
 
     def start(self):
         """
-        start server
+        Start the server and listen for incoming connections.
         """
         port = self.create_onion()
 
-        # bind port
         self.__socket.bind(("127.0.0.1", port))
-        # 启用监听
+
         self.__socket.listen(10)
         print('[Server] server is running......')
 
-        # enable listening
+
         self.__connections.clear()
         self.__nicknames.clear()
         self.__connections.append(None)
         self.__nicknames.append('System')
 
-        # start listening
+
         while True:
             connection, address = self.__socket.accept()
             print('[Server] received a new connection', connection.getsockname(), connection.fileno())
