@@ -26,10 +26,9 @@ class Client(Cmd):
 
     def __receive_message_thread(self):
         """
-        accept message thread
+        Continuously receive messages from the server.
         """
         while self.__isLogin:
-            # noinspection PyBroadException
             try:
                 buffer = self.__socket.recv(1024).decode()
                 stripped = self.decode(buffer)
@@ -48,9 +47,10 @@ class Client(Cmd):
 
     def decode(self, buffer):
         """
-        decode buffer
-        :param buffer: buffer
-        :return: list
+        Decode the buffer into individual JSON objects.
+
+        :param buffer: The buffer to be decoded.
+        :return: A list of JSON objects.
         """
         objects = []
         start = 0
@@ -73,8 +73,9 @@ class Client(Cmd):
 
     def __send_message_thread(self, message):
         """
-        send message thread
-        :param message: Message content
+        Send a message to the server.
+
+        :param message: The message to be sent.
         """
         try:
             self.__socket.send(json.dumps({
@@ -88,20 +89,20 @@ class Client(Cmd):
 
     def start(self):
         """
-        start the client
+        Connect to the server using the onion address.
         """
         onion = input("Enter your onion address: ")
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
         socket.socket = socks.socksocket
         server = (onion, 80)
         self.__socket.connect(server)
-        # run cmdloop with the folling arguments
         self.cmdloop()
 
     def do_login(self, args):
         """
-        login chat room
-        :param args: parameter
+        Login to the chat room.
+
+        :param args: The nickname to be used for the login.
         """
         nickname = args.split(' ')[0]
 
@@ -142,8 +143,9 @@ class Client(Cmd):
 
     def do_s(self, args):
         """
-        Send a message
-        :param args: parameter
+        Send a message to the chat room.
+
+        :param args: The message to be sent.
         """
         message = args
         # Show messages sent by yourself
@@ -155,8 +157,7 @@ class Client(Cmd):
 
     def do_logout(self, args=None):
         """
-        Sign out
-        :param args: parameter
+        Logout from the chat room.
         """
         self.__socket.send(json.dumps({
             'type': 'logout',
@@ -167,8 +168,8 @@ class Client(Cmd):
 
     def do_help(self, arg):
         """
-        help
-        :param arg: parameter
+        Display help information for the given command.
+        :param arg: the command for which help information is needed
         """
         command = arg.split(' ')[0]
         if command == '':
