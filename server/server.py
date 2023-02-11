@@ -47,6 +47,7 @@ class Server:
                     # remove the user from the list
                     self.__connections[user_id] = None
                     self.__nicknames[user_id] = None
+                    # close the current thread
                     break
                                 # remove the user from the list
                 # Decode the buffer into a string
