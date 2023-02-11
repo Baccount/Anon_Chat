@@ -147,13 +147,17 @@ class Client(Cmd):
 
         :param args: The message to be sent.
         """
-        message = args
-        # Show messages sent by yourself
-        print('[' + str(self.__nickname) + ']', message)
-        # Open child thread for sending data
-        thread = threading.Thread(target=self.__send_message_thread, args=(message,))
-        thread.setDaemon(True)
-        thread.start()
+        # only send message after login
+        if self.__isLogin:
+            message = args
+            # Show messages sent by yourself
+            print('[' + str(self.__nickname) + ']', message)
+            # Open child thread for sending data
+            thread = threading.Thread(target=self.__send_message_thread, args=(message,))
+            thread.setDaemon(True)
+            thread.start()
+        else:
+            print('[Client] You have not logged in yet')
 
     def do_logout(self, args=None):
         """
