@@ -17,6 +17,7 @@ class Server:
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__connections = list()
         self.__nicknames = list()
+        self.__lock = threading.Lock()
 
     def __user_thread(self, user_id):
         """
@@ -29,34 +30,70 @@ class Server:
         # self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
 
 
-        while True:
-            try:
-                buffer = connection.recv(1024).decode()
-                print(buffer)
-                # parsed into json data
-                obj = json.loads(buffer)
-                # broadcast message
-                if obj['type'] == 'broadcast':
-                    self.__broadcast(obj['sender_id'], obj['message'])
-                elif obj['type'] == 'logout':
-                    print('[Server] user', user_id, nickname, 'exit chat room')
-                    self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
-                    self.__connections[user_id].close()
-                    self.__connections[user_id] = None
-                    self.__nicknames[user_id] = None
-                    break
+        try:
+            while True:
+                buffer = b''
+                chunk = connection.recv(1024)
+                print(f"chunk: {chunk}")
+                if chunk:
+                    buffer += chunk
                 else:
-                    print("Your all ready logged in LINE 49")
                     break
-            except Exception as e:
-                print('server line 49')
-                print(e)
-                self.__connections[user_id].close()
-                # remove the user from the list
-                self.__connections[user_id] = None
-                self.__nicknames[user_id] = None
-                # remove the user from the list
-                break
+                # Decode the buffer into a string
+                buffer = buffer.decode()
+                print(f"buffer: {buffer}")
+                # Split the buffer into individual JSON objects
+                                # Split the buffer into individual JSON objects
+                objects = []
+                start = 0
+                end = buffer.find('{', start)
+                while end != -1:
+                    start = end
+                    count = 1
+                    end = start + 1
+                    while count > 0 and end < len(buffer):
+                        if buffer[end] == '{':
+                            count += 1
+                        elif buffer[end] == '}':
+                            count -= 1
+                        end += 1
+                    objects.append(buffer[start:end])
+                    start = end
+                    end = buffer.find('{', start)
+                    # Process each JSON object
+                    print(f'objects {objects}')
+                    for obj in objects:
+                        if obj:
+                            # Parse the JSON object
+                            obj = json.loads(obj)
+                                    # Broadcast message
+                            if obj['type'] == 'broadcast':
+                                self.__broadcast(obj['sender_id'], obj['message'])
+                            elif obj['type'] == 'logout':
+                                print('[Server] user', user_id, nickname, 'exit chat room')
+                                self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
+                                self.__connections[user_id].close()
+                                self.__connections[user_id] = None
+                                self.__nicknames[user_id] = None
+                                break
+                            else:
+                                print('[Server] user', user_id, nickname, 'exit chat room')
+                                print('server line 51')
+                                self.__connections[user_id].close()
+                                # remove the user from the list
+                                self.__connections[user_id] = None
+                                self.__nicknames[user_id] = None
+                                # remove the user from the list
+                            break
+        except Exception as e:
+            print('[Server] user', user_id, nickname, 'exit chat room')
+            print('server line 60')
+            print(e)
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+            # remove the user from the list
 
     def __broadcast(self, user_id=0, message=''):
         """
@@ -64,13 +101,19 @@ class Server:
         :param user_id: user id (0 is the system)
         :param message: broadcast content
         """
-        for i in range(1, len(self.__connections)):
-            if user_id != i and self.__connections[i]:
-                self.__connections[i].send(json.dumps({
-                    'sender_id': user_id,
-                    'sender_nickname': self.__nicknames[user_id],
-                    'message': message
-                }).encode())
+        # Acquire the lock to prevent multiple broadcasts from running simultaneously
+        self.__lock.acquire()
+        try:
+            for i in range(1, len(self.__connections)):
+                if user_id != i and self.__connections[i]:
+                    self.__connections[i].send(json.dumps({
+                        'sender_id': user_id,
+                        'sender_nickname': self.__nicknames[user_id],
+                        'message': message
+                    }).encode())
+        finally:
+            # Release the lock after the broadcast has finished
+            self.__lock.release()
 
     def __waitForLogin(self, connection):
         # try to accept data

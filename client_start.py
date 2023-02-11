@@ -18,6 +18,10 @@ from client.client import Client
 
 
 
-
-client = Client()
-client.start()
+try:
+    client = Client()
+    client.start()
+except KeyboardInterrupt:
+    # clear the terminal screen
+    print('\033[2J')
+    exit(0)
