@@ -27,7 +27,7 @@ class Server:
         nickname = self.__nicknames[user_id]
         print('[Server] user', user_id, nickname, 'join the chat room')
         # self.__broadcast(message='user ' + str(nickname) + 'joined the chat room')
-        connection.se
+
 
         while True:
             try:
@@ -83,6 +83,12 @@ class Server:
                 # If it is a connection command, then return a new user number to receive the user connection
                 #  and obj['nickname'] not in self.__nicknames
                 if obj['type'] == 'login':
+                    # check if the nickname is already in use
+                    if obj['nickname'] in self.__nicknames:
+                        connection.send(json.dumps({
+                            'id': -1
+                        }).encode())
+                        continue
                     self.__connections.append(connection)
                     self.__nicknames.append(obj['nickname'])
                     connection.send(json.dumps({
