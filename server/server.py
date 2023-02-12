@@ -4,21 +4,33 @@ import json
 from stem.control import Controller
 from random import randint
 import os
+from cmd import Cmd
 
 
-class Server:
+class Server(Cmd):
     """
     server class
     """
+    prompt = ''
+    intro = '[Welcome] Server Operator \n'
 
     def __init__(self):
         """
         structure
         """
+        super().__init__()
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+
+    def do_s(self, args):
+        """
+        Send a message to the chat room from the Server.
+
+        :param args: The message to be sent.
+        """
+        self.__broadcast(user_id=0 ,message=args)
 
     def separateJson(self, buffer):
         """
@@ -197,13 +209,6 @@ class Server:
 
             service = controller.create_ephemeral_hidden_service({80: port}, key_type = key_type, key_content = key_content, await_publication = True)
             print("Resumed %s.onion" % service.service_id)
-
-
-
-
-
-
-
         return port
 
     def delete_private_key(self):
@@ -240,7 +245,9 @@ class Server:
         self.__connections.append(None)
         self.__nicknames.append('System')
 
-
+        cmdThread = threading.Thread(target=self.cmdloop)
+        cmdThread.setDaemon(True)
+        cmdThread.start()
         while True:
             connection, address = self.__socket.accept()
             print('[Server] received a new connection', connection.getsockname(), connection.fileno())
