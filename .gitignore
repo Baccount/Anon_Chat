@@ -4,3 +4,4 @@
 # Python Cache
 /**/__pycache__
 .DS_Store
+server/private_key

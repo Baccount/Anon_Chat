@@ -3,6 +3,7 @@ import threading
 import json
 from stem.control import Controller
 from random import randint
+import os
 
 
 class Server:
@@ -155,14 +156,14 @@ class Server:
                     break
 
         except Exception as e:
-            print('server line 158')
+            print('Client Disconnected, server line 158')
             print(e)
-            print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
+            connection.close()
 
 
 
 
-    def create_onion(self):
+    def ephemeral_onion(self):
         '''
         create ephemeral hidden services
         '''
@@ -174,12 +175,60 @@ class Server:
         print(f"Created new hidden service with onion address: {response.service_id}.onion")
         return port
 
+
+    def non_ephemeral_onion(self):
+        '''
+        create non-ephemeral hidden services using a private key
+        '''
+        # set key path as the current directory
+        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+        port = randint(10000, 65535)
+        controller = Controller.from_port(port = 9051)
+        controller.authenticate()
+
+        if not os.path.exists(key_path):
+            service = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
+            print("Started a new hidden service with the address of %s.onion" % service.service_id)
+            with open(key_path, 'w') as key_file:
+                key_file.write('%s:%s' % (service.private_key_type, service.private_key))
+        else:
+            with open(key_path) as key_file:
+                key_type, key_content = key_file.read().split(':', 1)
+
+            service = controller.create_ephemeral_hidden_service({80: port}, key_type = key_type, key_content = key_content, await_publication = True)
+            print("Resumed %s.onion" % service.service_id)
+
+
+
+
+
+
+
+        return port
+
+    def delete_private_key(self):
+        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+        if os.path.exists(key_path):
+            os.remove(key_path)
+            print("Private key deleted")
+
     def start(self):
         """
         Start the server and listen for incoming connections.
         """
-        port = self.create_onion()
-
+        # ask if user wants to create ephemeral or non-ephemeral hidden service
+        print("Do you want to create an ephemeral or non-ephemeral hidden service?")
+        print("1. Ephemeral")
+        print("2. Non-ephemeral")
+        print("3. Delete private key")
+        choice = input("Enter choice: ")
+        if choice == "1":
+            port = self.ephemeral_onion()
+        elif choice == "2":
+            port = self.non_ephemeral_onion()
+        elif choice == "3":
+            self.delete_private_key()
+            exit()
         self.__socket.bind(("127.0.0.1", port))
 
         self.__socket.listen(10)

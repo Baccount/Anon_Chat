@@ -33,8 +33,8 @@ class Client(Cmd):
                 buffer = self.__socket.recv(1024).decode()
                 stripped = self.decode(buffer)
                 if not stripped:
-                    print('[Client] Unable to get data from server LINE 37')
-                    self.__isLogin = False
+                    print('[Client] Server offline, exiting LINE 37')
+                    exit()
                     break
                 for i in stripped:
                     obj = json.loads(i)
@@ -83,8 +83,11 @@ class Client(Cmd):
                 'sender_id': self.__id,
                 'message': message
             }).encode())
+        except BrokenPipeError as e:
+            print(f'{e} client line 86')
+            exit(0)
         except Exception as e:
-            print('client line 57')
+            print('client line 87')
             print(e)
 
     def start(self):
