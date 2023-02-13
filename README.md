@@ -17,3 +17,5 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 2. Clone this repository to your local machine using the following command:
 
 `git clone https://github.com/Baccount/Anon_Chat.git`
+
+`pip install -r requirements.txt`

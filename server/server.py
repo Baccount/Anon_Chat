@@ -6,7 +6,6 @@ from random import randint
 import os
 from cmd import Cmd
 
-
 class Server(Cmd):
     """
     Server Class
@@ -126,6 +125,20 @@ class Server(Cmd):
 
 
 
+    def decode_buffer(self, buffer):
+        return buffer.decode()
+
+
+    def handle_obj(self, obj, user_id, nickname):
+        if obj['type'] == 'broadcast':
+            self.__broadcast(obj['sender_id'], obj['message'])
+        elif obj['type'] == 'logout':
+            self.__broadcast(message=f'user {nickname} ({user_id}) has exited the chat room')
+            self.disconnectUsr(user_id, nickname)
+        else:
+            print('server line 96')
+            self.disconnectUsr(user_id, nickname)
+
     def __user_thread(self, user_id):
         """
         user thread
@@ -133,43 +146,35 @@ class Server(Cmd):
         """
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
-        print('[Server] user', user_id, nickname, 'join the chat room')
+        print(f'[Server] user {user_id} ({nickname}) joined the chat room')
+
         while True:
             try:
                 buffer = b''
                 chunk = connection.recv(1024)
                 print(f"chunk: {chunk}")
+
                 if chunk:
                     buffer += chunk
                 else:
                     self.disconnectUsr(user_id, nickname)
-                    # close the current thread
                     break
-                # Decode the buffer into a string
-                buffer = buffer.decode()
+
+                buffer = self.decode_buffer(buffer)
                 print(f"buffer: {buffer}")
-                # Split the buffer into individual JSON objects
+
                 objects = self.separateJson(buffer)
+
                 for obj in objects:
                     if obj:
-                        # Parse the JSON object
                         obj = json.loads(obj)
-                                # Broadcast message
-                        if obj['type'] == 'broadcast':
-                            self.__broadcast(obj['sender_id'], obj['message'])
-                        elif obj['type'] == 'logout':
-                            self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
-                            self.disconnectUsr(user_id, nickname)
-                            break
-                        else:
-                            print('server line 96')
-                            self.disconnectUsr(user_id, nickname)
-                            break
+                        self.handle_obj(obj, user_id, nickname)
             except Exception as e:
                 print('server line 97')
                 print(e)
                 self.disconnectUsr(user_id, nickname)
                 break
+
 
     def __broadcast(self, user_id=0, message=''):
         """
