@@ -10,7 +10,7 @@ class Client(Cmd):
     client
     """
     prompt = ''
-    intro = '[Welcome] Simple chat room client (Cli version)\n' + '[Welcome] Type help to get help\n'
+    intro = 'Welcom to AnonChat \n'
 
     def __init__(self):
         """

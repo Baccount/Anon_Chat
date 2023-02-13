@@ -9,7 +9,7 @@ from cmd import Cmd
 
 class Server(Cmd):
     """
-    server class
+    Server Class
     """
     prompt = ''
     intro = '[Welcome] Server Operator \n'
@@ -30,6 +30,8 @@ class Server(Cmd):
 
         :param args: The message to be sent.
         """
+        # cahnge the message color to green
+        args = '\033[92m' + args + '\033[0m'
         self.__broadcast(user_id=0 ,message=args)
 
     def separateJson(self, buffer):
@@ -243,7 +245,7 @@ class Server(Cmd):
         self.__connections.clear()
         self.__nicknames.clear()
         self.__connections.append(None)
-        self.__nicknames.append('System')
+        self.__nicknames.append('\033[92m' + 'Server' + '\033[0m')
 
         cmdThread = threading.Thread(target=self.cmdloop)
         cmdThread.setDaemon(True)
