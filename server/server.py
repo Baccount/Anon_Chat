@@ -24,6 +24,33 @@ class Server(Cmd):
         self.__nicknames = list()
         self.__lock = threading.Lock()
 
+
+    def do_ban(self, args):
+        """
+        Ban a user from the chat room.
+
+        :param args: The id of the user to be banned.
+        """
+        # check if args is a int
+        try:
+            self.ban_user(user_id=int(args))
+        except Exception as e:
+            print('server line 38')
+            print(e)
+
+    def do_l(self, args):
+        """
+        List all users in the chat room.
+
+        """
+        try:
+            for i in range(1, len(self.__connections)):
+                print(f'{i} : {self.__nicknames[i]}')
+        except Exception as e:
+            print('server line 51')
+            print(e)
+
+
     def do_s(self, args):
         """
         Send a message to the chat room from the Server.
@@ -33,6 +60,40 @@ class Server(Cmd):
         # cahnge the message color to green
         args = '\033[92m' + args + '\033[0m'
         self.__broadcast(user_id=0 ,message=args)
+
+
+    def ban_user(self, user_id):
+        """
+        ban user from the chat room
+        :param user_id: user id
+        """
+        try:
+            self.__broadcast(message='user ' + str(self.__nicknames[user_id]) + '(' + str(user_id) + ')' + ' has been banned')
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+        except Exception as e:
+            print('server line 81')
+            print(e)
+
+
+
+    def disconnectUsr(self, user_id, nickname="NONE"):
+        """
+        disconnect User
+        """
+        try:
+            print('[Server] user', user_id, nickname, 'exit chat room')
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+        except Exception as e:
+            print('server line 77')
+            print(e)
+
+
 
     def separateJson(self, buffer):
         """
@@ -61,16 +122,6 @@ class Server(Cmd):
             print(f'objects {objects}')
             return objects
 
-    def disconnectUsr(self, user_id, nickname):
-        """
-        disconnect User
-        """
-        print('[Server] user', user_id, nickname, 'exit chat room')
-        print('server line 45')
-        self.__connections[user_id].close()
-        # remove the user from the list
-        self.__connections[user_id] = None
-        self.__nicknames[user_id] = None
 
 
 
