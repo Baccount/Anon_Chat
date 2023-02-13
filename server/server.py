@@ -68,7 +68,8 @@ class Server(Cmd):
         :param user_id: user id
         """
         try:
-            self.__broadcast(message='user ' + str(self.__nicknames[user_id]) + '(' + str(user_id) + ')' + ' has been banned')
+            nickname = self.__nicknames[user_id]
+            self.__broadcast(message=f"User {nickname}({user_id}) has been banned from the chat room")
             self.__connections[user_id].close()
             # remove the user from the list
             self.__connections[user_id] = None
