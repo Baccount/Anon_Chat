@@ -3,20 +3,147 @@ import threading
 import json
 from stem.control import Controller
 from random import randint
+import os
+from cmd import Cmd
 
-
-class Server:
+class Server(Cmd):
     """
-    server class
+    Server Class
     """
+    prompt = ''
+    intro = '[Welcome] Server Operator \n'
 
     def __init__(self):
         """
         structure
         """
+        super().__init__()
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__connections = list()
         self.__nicknames = list()
+        self.__lock = threading.Lock()
+        self.port = randint(10000, 65535)
+        self.controller = Controller.from_port(port = 9051)
+        self.controller.authenticate()
+
+    def do_ban(self, args):
+        """
+        Ban a user from the chat room.
+
+        :param args: The id of the user to be banned.
+        """
+        try:
+            self.ban_user(user_id=int(args))
+        except Exception as e:
+            print('server line 38')
+            print(e)
+
+    def do_l(self, args):
+        """
+        List all users in the chat room.
+
+        """
+        try:
+            for i in range(1, len(self.__connections)):
+                print(f'{i} : {self.__nicknames[i]}')
+        except Exception as e:
+            print('server line 51')
+            print(e)
+
+
+    def do_s(self, args):
+        """
+        Send a message to the chat room from the Server.
+
+        :param args: The message to be sent.
+        """
+        args = '\033[92m' + args + '\033[0m'
+        self.__broadcast(user_id=0 ,message=args)
+
+
+    def ban_user(self, user_id):
+        """
+        Ban a user from the chat room.
+
+        Args:
+        - user_id (int): The ID of the user to be banned.
+        """
+        try:
+            nickname = self.__nicknames[user_id]
+            self.__broadcast(message=f"User {nickname}({user_id}) has been banned from the chat room")
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+        except Exception as e:
+            print('server line 81')
+            print(e)
+
+
+
+    def disconnectUsr(self, user_id, nickname="NONE"):
+        """
+        Disconnect a user from the chat room.
+
+        Args:
+        - user_id (int): The ID of the user to be disconnected.
+        - nickname (str, optional): The nickname of the user. Default is "NONE".
+        """
+        try:
+            print('[Server] user', user_id, nickname, 'exit chat room')
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+        except Exception as e:
+            print('server line 77')
+            print(e)
+
+
+
+    def separateJson(self, buffer):
+        """
+        Separate a buffer of text into individual JSON objects.
+
+        :param buffer: A string buffer containing one or more JSON objects.
+        :return: A list of strings, each representing a separate JSON object.
+        """
+        objects = []
+        start = 0
+        end = buffer.find('{', start)
+        while end != -1:
+            start = end
+            count = 1
+            end = start + 1
+            while count > 0 and end < len(buffer):
+                if buffer[end] == '{':
+                    count += 1
+                elif buffer[end] == '}':
+                    count -= 1
+                end += 1
+            objects.append(buffer[start:end])
+            start = end
+            end = buffer.find('{', start)
+            # Process each JSON object
+            print(f'objects {objects}')
+            return objects
+
+
+
+
+    def decode_buffer(self, buffer):
+        return buffer.decode()
+
+
+    def handle_obj(self, obj, user_id, nickname):
+        if obj['type'] == 'broadcast':
+            self.__broadcast(obj['sender_id'], obj['message'])
+        elif obj['type'] == 'logout':
+            self.__broadcast(message=f'user {nickname} ({user_id}) has exited the chat room')
+            self.disconnectUsr(user_id, nickname)
+        else:
+            print('server line 96')
+            self.disconnectUsr(user_id, nickname)
 
     def __user_thread(self, user_id):
         """
@@ -25,34 +152,35 @@ class Server:
         """
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
-        print('[Server] user', user_id, nickname, 'join the chat room')
-        self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'join the chat room')
+        print(f'[Server] user {user_id} ({nickname}) joined the chat room')
 
         while True:
             try:
-                buffer = connection.recv(1024).decode()
-                # parsed into json data
-                obj = json.loads(buffer)
-                # broadcast message
-                if obj['type'] == 'broadcast':
-                    self.__broadcast(obj['sender_id'], obj['message'])
-                elif obj['type'] == 'logout':
-                    print('[Server] user', user_id, nickname, 'exit chat room')
-                    self.__broadcast(message='user ' + str(nickname) + '(' + str(user_id) + ')' + 'exit chat room')
-                    self.__connections[user_id].close()
-                    self.__connections[user_id] = None
-                    self.__nicknames[user_id] = None
-                    break
+                buffer = b''
+                chunk = connection.recv(1024)
+                print(f"chunk: {chunk}")
+
+                if chunk:
+                    buffer += chunk
                 else:
-                    print('[Server] Unable to parse json packet:', connection.getsockname(), connection.fileno())
+                    self.disconnectUsr(user_id, nickname)
+                    break
+
+                buffer = self.decode_buffer(buffer)
+                print(f"buffer: {buffer}")
+
+                objects = self.separateJson(buffer)
+
+                for obj in objects:
+                    if obj:
+                        obj = json.loads(obj)
+                        self.handle_obj(obj, user_id, nickname)
             except Exception as e:
+                print('server line 97')
                 print(e)
-                self.__connections[user_id].close()
-                # remove the user from the list
-                self.__connections[user_id] = None
-                self.__nicknames[user_id] = None
-                # remove the user from the list
+                self.disconnectUsr(user_id, nickname)
                 break
+
 
     def __broadcast(self, user_id=0, message=''):
         """
@@ -60,89 +188,121 @@ class Server:
         :param user_id: user id (0 is the system)
         :param message: broadcast content
         """
-        for i in range(1, len(self.__connections)):
-            if user_id != i and self.__connections[i]:
-                self.__connections[i].send(json.dumps({
-                    'sender_id': user_id,
-                    'sender_nickname': self.__nicknames[user_id],
-                    'message': message
-                }).encode())
+        # Acquire the lock to prevent multiple broadcasts from running simultaneously
+        self.__lock.acquire()
+        try:
+            for i in range(1, len(self.__connections)):
+                if user_id != i and self.__connections[i]:
+                    self.__connections[i].send(json.dumps({
+                        'sender_id': user_id,
+                        'sender_nickname': self.__nicknames[user_id],
+                        'message': message
+                    }).encode())
+        finally:
+            # Release the lock after the broadcast has finished
+            self.__lock.release()
 
-    def check_duplicate_nickname(self, nickname):
-        '''
-        check if nickname is already taken
-        '''
-        for nick in self.__nicknames:
-            if nick == nickname:
-                return True
-        return False
     def __waitForLogin(self, connection):
-        # try to accept data
-        # noinspection PyBroadException
+        """
+        Wait for a client to log in and start a new thread for the client.
+
+        :param connection: The connection with the client.
+        """
         try:
             while True:
                 buffer = connection.recv(1024).decode()
-                # parsed into json data
+                print(buffer)
                 obj = json.loads(buffer)
-                # If it is a connection command, then return a new user number to receive the user connection
-                # If the nickname is already taken, then return a -1
-                if obj['type'] == 'login' and obj['nickname'] not in self.__nicknames:
+                if obj['type'] == 'login':
+                    # check if the nickname is already in use
+                    if obj['nickname'] in self.__nicknames:
+                        connection.send(json.dumps({
+                            'id': -1
+                        }).encode())
+                        continue
+                    # add the connection and nickname to the lists
                     self.__connections.append(connection)
                     self.__nicknames.append(obj['nickname'])
                     connection.send(json.dumps({
                         'id': len(self.__connections) - 1
                     }).encode())
-                    # start a new thread
+                    # start a new thread for the user
                     thread = threading.Thread(target=self.__user_thread, args=(len(self.__connections) - 1,))
                     thread.setDaemon(True)
                     thread.start()
                     break
 
-
-
-                else:
-                    # send a -1 message to the client to indicate that the nickname is already taken
-                    print('[Server] nickname already taken' + obj['nickname'])
-                    connection.send(json.dumps({
-                        'id': -1
-                    }).encode())
-        except Exception:
-            print('[Server] Unable to accept data:', connection.getsockname(), connection.fileno())
+        except Exception as e:
+            print('Client Disconnected, server line 158')
+            print(e)
+            connection.close()
 
 
 
 
-    def create_onion(self):
+    def ephemeral_onion(self):
         '''
         create ephemeral hidden services
         '''
-        port = randint(10000, 65535)
-        controller = Controller.from_port(port = 9051)
-        controller.authenticate()
 
-        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
-        print(f"Created new hidden service with onion address: {response.service_id}.onion")
-        return port
+        return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+
+
+    def non_ephemeral_onion(self):
+        '''
+        create non-ephemeral hidden services using a private key
+        '''
+        # set key path as the current directory
+        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+
+        if not os.path.exists(key_path):
+            response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+            with open(key_path, 'w') as key_file:
+                key_file.write('%s:%s' % (response.private_key_type, response.private_key))
+            return response
+        else:
+            with open(key_path) as key_file:
+                key_type, key_content = key_file.read().split(':', 1)
+            response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type = key_type, key_content = key_content, await_publication = True)
+
+        return response
+
+    def delete_private_key(self):
+        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+        if os.path.exists(key_path):
+            os.remove(key_path)
+            print("Private key deleted")
 
     def start(self):
         """
-        start server
+        Start the server and listen for incoming connections.
         """
-        port = self.create_onion()
+        print("Do you want to create an ephemeral or non-ephemeral hidden service?")
+        print("1. Ephemeral")
+        print("2. Non-ephemeral")
+        print("3. Delete private key")
+        choice = input("Enter choice: ")
+        if choice == "1":
+            response = self.ephemeral_onion()
+        elif choice == "2":
+            response = self.non_ephemeral_onion()
+        elif choice == "3":
+            self.delete_private_key()
+            exit()
+        self.__socket.bind(("127.0.0.1", self.port))
 
-        # bind port
-        self.__socket.bind(("127.0.0.1", port))
-        # 启用监听
         self.__socket.listen(10)
         print('[Server] server is running......')
+        print(f"Onion Service: {response.service_id}.onion")
 
-        # enable listening
         self.__connections.clear()
         self.__nicknames.clear()
         self.__connections.append(None)
-        self.__nicknames.append('System')
+        self.__nicknames.append('\033[92m' + 'Server' + '\033[0m')
 
-        # start listening
+        cmdThread = threading.Thread(target=self.cmdloop)
+        cmdThread.setDaemon(True)
+        cmdThread.start()
         while True:
             connection, address = self.__socket.accept()
             print('[Server] received a new connection', connection.getsockname(), connection.fileno())
