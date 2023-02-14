@@ -26,15 +26,6 @@ class Server(Cmd):
         self.controller = Controller.from_port(port = 9051)
         self.controller.authenticate()
 
-    def do_quit(self, args):
-        """
-        Quit the server.
-
-        """
-        print('[Server] Server is shutting down...')
-        
-        pass
-
     def do_ban(self, args):
         """
         Ban a user from the chat room.
@@ -275,15 +266,6 @@ class Server(Cmd):
             response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type = key_type, key_content = key_content, await_publication = True)
 
         return response
-
-
-
-
-
-
-
-
-
 
     def delete_private_key(self):
         key_path = os.path.join(os.path.dirname(__file__), 'private_key')
