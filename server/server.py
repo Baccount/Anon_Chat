@@ -22,7 +22,18 @@ class Server(Cmd):
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+        self.port = randint(10000, 65535)
+        self.controller = Controller.from_port(port = 9051)
+        self.controller.authenticate()
 
+    def do_quit(self, args):
+        """
+        Quit the server.
+
+        """
+        print('[Server] Server is shutting down...')
+        
+        pass
 
     def do_ban(self, args):
         """
@@ -30,7 +41,6 @@ class Server(Cmd):
 
         :param args: The id of the user to be banned.
         """
-        # check if args is a int
         try:
             self.ban_user(user_id=int(args))
         except Exception as e:
@@ -56,15 +66,16 @@ class Server(Cmd):
 
         :param args: The message to be sent.
         """
-        # cahnge the message color to green
         args = '\033[92m' + args + '\033[0m'
         self.__broadcast(user_id=0 ,message=args)
 
 
     def ban_user(self, user_id):
         """
-        ban user from the chat room
-        :param user_id: user id
+        Ban a user from the chat room.
+
+        Args:
+        - user_id (int): The ID of the user to be banned.
         """
         try:
             nickname = self.__nicknames[user_id]
@@ -81,7 +92,11 @@ class Server(Cmd):
 
     def disconnectUsr(self, user_id, nickname="NONE"):
         """
-        disconnect User
+        Disconnect a user from the chat room.
+
+        Args:
+        - user_id (int): The ID of the user to be disconnected.
+        - nickname (str, optional): The nickname of the user. Default is "NONE".
         """
         try:
             print('[Server] user', user_id, nickname, 'exit chat room')
@@ -238,13 +253,8 @@ class Server(Cmd):
         '''
         create ephemeral hidden services
         '''
-        port = randint(10000, 65535)
-        controller = Controller.from_port(port = 9051)
-        controller.authenticate()
 
-        response = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
-        print(f"Created new hidden service with onion address: {response.service_id}.onion")
-        return port
+        return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
 
 
     def non_ephemeral_onion(self):
@@ -253,22 +263,27 @@ class Server(Cmd):
         '''
         # set key path as the current directory
         key_path = os.path.join(os.path.dirname(__file__), 'private_key')
-        port = randint(10000, 65535)
-        controller = Controller.from_port(port = 9051)
-        controller.authenticate()
 
         if not os.path.exists(key_path):
-            service = controller.create_ephemeral_hidden_service({80: port}, await_publication = True)
-            print("Started a new hidden service with the address of %s.onion" % service.service_id)
+            response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
             with open(key_path, 'w') as key_file:
-                key_file.write('%s:%s' % (service.private_key_type, service.private_key))
+                key_file.write('%s:%s' % (response.private_key_type, response.private_key))
+            return response
         else:
             with open(key_path) as key_file:
                 key_type, key_content = key_file.read().split(':', 1)
+            response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type = key_type, key_content = key_content, await_publication = True)
 
-            service = controller.create_ephemeral_hidden_service({80: port}, key_type = key_type, key_content = key_content, await_publication = True)
-            print("Resumed %s.onion" % service.service_id)
-        return port
+        return response
+
+
+
+
+
+
+
+
+
 
     def delete_private_key(self):
         key_path = os.path.join(os.path.dirname(__file__), 'private_key')
@@ -280,24 +295,23 @@ class Server(Cmd):
         """
         Start the server and listen for incoming connections.
         """
-        # ask if user wants to create ephemeral or non-ephemeral hidden service
         print("Do you want to create an ephemeral or non-ephemeral hidden service?")
         print("1. Ephemeral")
         print("2. Non-ephemeral")
         print("3. Delete private key")
         choice = input("Enter choice: ")
         if choice == "1":
-            port = self.ephemeral_onion()
+            response = self.ephemeral_onion()
         elif choice == "2":
-            port = self.non_ephemeral_onion()
+            response = self.non_ephemeral_onion()
         elif choice == "3":
             self.delete_private_key()
             exit()
-        self.__socket.bind(("127.0.0.1", port))
+        self.__socket.bind(("127.0.0.1", self.port))
 
         self.__socket.listen(10)
         print('[Server] server is running......')
-
+        print(f"Onion Service: {response.service_id}.onion")
 
         self.__connections.clear()
         self.__nicknames.clear()
