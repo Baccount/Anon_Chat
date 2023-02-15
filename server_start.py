@@ -1,6 +1,7 @@
 from server.server import Server
 import os
 import subprocess
+from time import sleep
 
 # check if brew is installed and install if not on mac
 try:
@@ -16,8 +17,19 @@ except subprocess.CalledProcessError:
     print('Tor is not installed')
     os.system("brew install tor")
 
-# start tor service using brew and print the status
-os.system("brew services restart tor")
+# Check if Tor is running
+try:
+    output = subprocess.check_output(['pgrep', '-f', '^/usr/local/opt/tor/bin/tor$'])
+    if output:
+        print('Tor is running')
+    else:
+        print('Tor is not running')
+        os.system("brew services restart tor")
+        sleep(5)
+except subprocess.CalledProcessError:
+    print('Tor is not running')
+    os.system("brew services restart tor")
+    sleep(5)
 
 server = Server()
 server.start()
