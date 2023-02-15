@@ -1,3 +1,15 @@
+import requests
+import sys
+import os
+import inspect
+
+
+# Common paths
+root_path = os.path.dirname(
+    os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+)
+working_path = os.path.join(root_path, "build", "tor")
+
 def update_tor_bridges():
     """
     Update the built-in Tor Bridges in OnionShare's torrc templates.
@@ -44,3 +56,5 @@ def update_tor_bridges():
                 for item in bridges:
                     f.write(f"Bridge {item}\n")
 
+if __name__ == "__main__":
+    update_tor_bridges()
