@@ -9,7 +9,7 @@ class Tor(object):
         socket.socket = socks.socksocket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def start_onion(self, onion):
+    def connect_onion(self, onion):
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
         socket.socket = socks.socksocket
         self.server = (onion, 80)

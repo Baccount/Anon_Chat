@@ -94,7 +94,7 @@ class Client(Cmd):
         """
         onion = input("Enter your onion address: ")
         # start tor onion service
-        self.tor.start_onion(onion)
+        self.tor.connect_onion(onion)
         self.cmdloop()
 
     def do_login(self, args):
