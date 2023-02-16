@@ -260,14 +260,12 @@ class Server(Cmd):
         elif choice == "3":
             self.delete_private_key()
             exit()
-        self.tor.socket.bind(("127.0.0.1", self.tor.port))
 
-        self.tor.socket.listen(10)
+
         print('[Server] server is running......')
         print(f"Onion Service: {response.service_id}.onion")
 
-        self.__connections.clear()
-        self.__nicknames.clear()
+
         self.__connections.append(None)
         self.__nicknames.append('\033[92m' + 'Server' + '\033[0m')
 

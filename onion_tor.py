@@ -10,7 +10,8 @@ class CreateOnion():
         self.port = randint(10000, 65535)
         self.controller = Controller.from_port(port = 9051)
         self.controller.authenticate()
-    # TODO : Add create onion service function
+        self.socket.bind(("127.0.0.1", self.port))
+        self.socket.listen(10)
 
 
     def ephemeral_onion(self):
