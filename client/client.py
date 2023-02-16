@@ -1,8 +1,7 @@
-import socket
 import threading
 import json
 from cmd import Cmd
-import socks
+from connect_tor import Tor
 
 
 class Client(Cmd):
@@ -17,9 +16,8 @@ class Client(Cmd):
         structure
         """
         super().__init__()
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
-        socket.socket = socks.socksocket
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # create a new tor instance
+        self.tor = Tor()
         self.__id = None
         self.__nickname = None
         self.__isLogin = False
@@ -30,7 +28,7 @@ class Client(Cmd):
         """
         while self.__isLogin:
             try:
-                buffer = self.__socket.recv(1024).decode()
+                buffer = self.tor.socket.recv(1024).decode()
                 stripped = self.decode(buffer)
                 if not stripped:
                     print('[Client] Server offline, exiting LINE 37')
@@ -78,7 +76,7 @@ class Client(Cmd):
         :param message: The message to be sent.
         """
         try:
-            self.__socket.send(json.dumps({
+            self.tor.socket.send(json.dumps({
                 'type': 'broadcast',
                 'sender_id': self.__id,
                 'message': message
@@ -95,10 +93,8 @@ class Client(Cmd):
         Connect to the server using the onion address.
         """
         onion = input("Enter your onion address: ")
-        socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
-        socket.socket = socks.socksocket
-        server = (onion, 80)
-        self.__socket.connect(server)
+        # start tor onion service
+        self.tor.start_onion(onion)
         self.cmdloop()
 
     def do_login(self, args):
@@ -112,14 +108,14 @@ class Client(Cmd):
         # only login once
         if not self.__isLogin:
             # Send the nickname to the server to get the user id
-            self.__socket.send(json.dumps({
+            self.tor.socket.send(json.dumps({
                 'type': 'login',
                 'nickname': nickname
             }).encode())
 
 
             try:
-                buffer = self.__socket.recv(1024).decode()
+                buffer = self.tor.socket.recv(1024).decode()
                 print(buffer)
                 obj = json.loads(buffer)
                 if obj['id']:
@@ -166,7 +162,7 @@ class Client(Cmd):
         """
         Logout from the chat room.
         """
-        self.__socket.send(json.dumps({
+        self.tor.socket.send(json.dumps({
             'type': 'logout',
             'sender_id': self.__id
         }).encode())
