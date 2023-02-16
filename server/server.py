@@ -1,10 +1,8 @@
-import socket
 import threading
 import json
-from stem.control import Controller
-from random import randint
 import os
 from cmd import Cmd
+from onion_tor import ConnectTor
 
 class Server(Cmd):
     """
@@ -18,13 +16,11 @@ class Server(Cmd):
         structure
         """
         super().__init__()
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # create Tor Onion instance
+        self.tor = ConnectTor()
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
-        self.port = randint(10000, 65535)
-        self.controller = Controller.from_port(port = 9051)
-        self.controller.authenticate()
 
     def do_ban(self, args):
         """
@@ -245,7 +241,7 @@ class Server(Cmd):
         create ephemeral hidden services
         '''
 
-        return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+        return self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, await_publication = True)
 
 
     def non_ephemeral_onion(self):
@@ -256,14 +252,14 @@ class Server(Cmd):
         key_path = os.path.join(os.path.dirname(__file__), 'private_key')
 
         if not os.path.exists(key_path):
-            response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+            response = self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, await_publication = True)
             with open(key_path, 'w') as key_file:
                 key_file.write('%s:%s' % (response.private_key_type, response.private_key))
             return response
         else:
             with open(key_path) as key_file:
                 key_type, key_content = key_file.read().split(':', 1)
-            response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type = key_type, key_content = key_content, await_publication = True)
+            response = self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, key_type=key_type, key_content=key_content, await_publication = True)
 
         return response
 
@@ -289,9 +285,9 @@ class Server(Cmd):
         elif choice == "3":
             self.delete_private_key()
             exit()
-        self.__socket.bind(("127.0.0.1", self.port))
+        self.tor.socket.bind(("127.0.0.1", self.tor.port))
 
-        self.__socket.listen(10)
+        self.tor.socket.listen(10)
         print('[Server] server is running......')
         print(f"Onion Service: {response.service_id}.onion")
 
@@ -304,7 +300,7 @@ class Server(Cmd):
         cmdThread.setDaemon(True)
         cmdThread.start()
         while True:
-            connection, address = self.__socket.accept()
+            connection, address = self.tor.socket.accept()
             print('[Server] received a new connection', connection.getsockname(), connection.fileno())
 
             thread = threading.Thread(target=self.__waitForLogin, args=(connection,))
