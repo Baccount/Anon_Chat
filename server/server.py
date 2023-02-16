@@ -2,7 +2,7 @@ import threading
 import json
 import os
 from cmd import Cmd
-from onion_tor import ConnectTor
+from onion_tor import CreateOnion
 
 class Server(Cmd):
     """
@@ -16,8 +16,8 @@ class Server(Cmd):
         structure
         """
         super().__init__()
-        # create Tor Onion instance
-        self.tor = ConnectTor()
+        # CreateOnion Tor Onion instance
+        self.tor = CreateOnion()
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
@@ -236,32 +236,7 @@ class Server(Cmd):
 
 
 
-    def ephemeral_onion(self):
-        '''
-        create ephemeral hidden services
-        '''
 
-        return self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, await_publication = True)
-
-
-    def non_ephemeral_onion(self):
-        '''
-        create non-ephemeral hidden services using a private key
-        '''
-        # set key path as the current directory
-        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
-
-        if not os.path.exists(key_path):
-            response = self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, await_publication = True)
-            with open(key_path, 'w') as key_file:
-                key_file.write('%s:%s' % (response.private_key_type, response.private_key))
-            return response
-        else:
-            with open(key_path) as key_file:
-                key_type, key_content = key_file.read().split(':', 1)
-            response = self.tor.controller.create_ephemeral_hidden_service({80: self.tor.port}, key_type=key_type, key_content=key_content, await_publication = True)
-
-        return response
 
     def delete_private_key(self):
         key_path = os.path.join(os.path.dirname(__file__), 'private_key')
@@ -273,15 +248,15 @@ class Server(Cmd):
         """
         Start the server and listen for incoming connections.
         """
-        print("Do you want to create an ephemeral or non-ephemeral hidden service?")
+        print("Do you want to CreateOnion an ephemeral or non-ephemeral hidden service?")
         print("1. Ephemeral")
         print("2. Non-ephemeral")
         print("3. Delete private key")
         choice = input("Enter choice: ")
         if choice == "1":
-            response = self.ephemeral_onion()
+            response = self.tor.ephemeral_onion()
         elif choice == "2":
-            response = self.non_ephemeral_onion()
+            response = self.tor.non_ephemeral_onion()
         elif choice == "3":
             self.delete_private_key()
             exit()
