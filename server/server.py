@@ -29,6 +29,9 @@ class Server(Cmd):
         :param args: The id of the user to be banned.
         """
         try:
+            if int(args) == 0:
+                print('Cannot ban server because it is the server!')
+                return
             self.ban_user(user_id=int(args))
         except Exception as e:
             print('server line 38')
@@ -40,7 +43,7 @@ class Server(Cmd):
 
         """
         try:
-            for i in range(1, len(self.__connections)):
+            for i in range(len(self.__connections)):
                 print(f'{i} : {self.__nicknames[i]}')
         except Exception as e:
             print('server line 51')
@@ -172,7 +175,7 @@ class Server(Cmd):
                         obj = json.loads(obj)
                         self.handle_obj(obj, user_id, nickname)
             except Exception as e:
-                print('server line 97')
+                print('server line 177')
                 print(e)
                 self.disconnectUsr(user_id, nickname)
                 break
@@ -187,7 +190,7 @@ class Server(Cmd):
         # Acquire the lock to prevent multiple broadcasts from running simultaneously
         self.__lock.acquire()
         try:
-            for i in range(1, len(self.__connections)):
+            for i in range(len(self.__connections)):
                 if user_id != i and self.__connections[i]:
                     self.__connections[i].send(json.dumps({
                         'sender_id': user_id,
