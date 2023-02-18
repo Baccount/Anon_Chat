@@ -56,5 +56,37 @@ def update_tor_bridges():
                 for item in bridges:
                     f.write(f"Bridge {item}\n")
 
+
+def load_tor_bridges():
+    """
+    Load the built-in Tor Bridges from OnionShare's torrc templates.
+    """
+    bridges = []
+    for bridge_type in ["meek-azure", "obfs4", "snowflake"]:
+        if bridge_type == "meek-azure":
+            torrc_template_extension = "meek_lite_azure"
+        else:
+            torrc_template_extension = bridge_type
+        torrc_template = os.path.join(
+            root_path,
+            torrc_template_dir,
+            f"torrc_template-{torrc_template_extension}",
+        )
+
+        with open(torrc_template, "r") as f:
+            for line in f.readlines():
+                if line.startswith("Bridge "):
+                    bridges.append(line.strip().split(" ")[1])
+    return bridges
+
+# connect tor using bridges
+def connect_tor():
+    bridges = load_tor_bridges()
+    print(bridges)
+    # tor = stem.control.Controller.from_port(port=9051)
+    # tor.authenticate()
+    # tor.set_options({
+    #     'SocksPort': '
+
 if __name__ == "__main__":
     update_tor_bridges()
