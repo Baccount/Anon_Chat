@@ -415,7 +415,7 @@ class Onion(object):
             time.sleep(2)
 
             return_code = self.tor_proc.poll()
-            if return_code != None:
+            if return_code is not None:
                 self.common.log("Onion", "connect", f"tor process has terminated early: {return_code}")
 
             # Connect to the controller
@@ -646,6 +646,7 @@ class Onion(object):
                 await_publication=False,
                 key_type="NEW",
                 key_content="ED25519-V3",
+                # trunk-ignore(gitleaks/generic-api-key)
                 client_auth_v3="E2GOT5LTUTP3OAMRCRXO4GSH6VKJEUOXZQUC336SRKAHTTT5OVSA",
             )
             tmp_service_id = res.service_id

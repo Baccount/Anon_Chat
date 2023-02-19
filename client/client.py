@@ -1,7 +1,7 @@
 import threading
 import json
 from cmd import Cmd
-from connect_tor import Tor
+from .connect_tor import Tor
 
 
 class Client(Cmd):
