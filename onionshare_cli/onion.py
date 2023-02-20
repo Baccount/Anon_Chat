@@ -415,7 +415,7 @@ class Onion(object):
             time.sleep(2)
 
             return_code = self.tor_proc.poll()
-            if return_code != None:
+            if return_code is not None:
                 self.common.log("Onion", "connect", f"tor process has terminated early: {return_code}")
 
             # Connect to the controller
