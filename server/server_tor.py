@@ -5,6 +5,12 @@ from stem.control import Controller
 import os
 
 
+class BundledTorCanceled(Exception):
+    """
+    This exception is raised if onionshare is set to use the bundled Tor binary,
+    and the user cancels connecting to Tor
+    """
+
 
 class CreateOnion():
 
