@@ -20,6 +20,7 @@ class CreateOnion():
         self.port = randint(10000, 65535)
         self.controller = Controller.from_port(port=9051)
         self.controller.authenticate()
+        print(self.controller.get_info("status/bootstrap-phase"))
         self.socket.bind(("127.0.0.1", self.port))
         self.socket.listen(10)
 

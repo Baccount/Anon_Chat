@@ -12,7 +12,9 @@ tor_cfg = {
     'ControlPort': '9051',
     'CookieAuthentication': '1',
     'ClientTransportPlugin': 'obfs4 exec {0}'.format(obsf4),
-    'Bridge': 'obfs4 [2a0c:4d80:42:702::1]:27015 C5B7CD6946FF10C5B3E89691A7D3F2C122D2117C cert=TD7PbUO0/0k6xYHMPW3vJxICfkMZNdkRrb63Zhl5j9dW3iRGiCx0A7mPhe5T2EDzQ35+Zw iat-mode=0'
+    'Bridge': 'obfs4 [2a0c:4d80:42:702::1]:27015 C5B7CD6946FF10C5B3E89691A7D3F2C122D2117C cert=TD7PbUO0/0k6xYHMPW3vJxICfkMZNdkRrb63Zhl5j9dW3iRGiCx0A7mPhe5T2EDzQ35+Zw iat-mode=0',
+    'AvoidDiskWrites': '1',
+    'Log': 'notice stdout',
 }
 class StartServer():
     def __init__(self):
