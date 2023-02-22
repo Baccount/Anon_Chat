@@ -13,12 +13,15 @@ tor_cfg = {
     'CookieAuthentication': '1',
 }
 
-# start Tor with the new configuration
-tor_process = launch_tor_with_config(
-    config=tor_cfg,
-    tor_cmd=tor_dir,  # path to your tor binary
-    timeout=60
-)
+# start Tor with the new configuration if tor is not running
+try:
+    tor_process = launch_tor_with_config(
+        config=tor_cfg,
+        tor_cmd=tor_dir,  # path to your tor binary
+        timeout=60
+    )
+except Exception as e:
+    print(e)
 
 
 
