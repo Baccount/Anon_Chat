@@ -1,10 +1,7 @@
 from client.client import Client
 import os
 from stem.process import launch_tor_with_config
-import colorama
-from colorama import Fore, Back, Style
-import time
-
+from logging_msg import log_msg
 
 
 verbose = True
@@ -23,23 +20,10 @@ class ClientServer():
     def __init__(self):
         pass
 
-    def log(self, module, func, msg=None):
-        """
-        If verbose mode is on, log error messages to stdout
-        """
-        if verbose:
-            timestamp = time.strftime("%b %d %Y %X")
-            final_msg = f"{Fore.LIGHTBLACK_EX + Style.DIM}[{timestamp}]{Style.RESET_ALL} {Fore.WHITE + Style.DIM}{module}.{func}{Style.RESET_ALL}"
-            if msg:
-                final_msg = (
-                    f"{final_msg}{Fore.WHITE + Style.DIM}: {msg}{Style.RESET_ALL}"
-                )
-            print(final_msg)
-
 
     def start(self):
         # start Tor with the new configuration if tor is not running
-        self.log("Onion", "connect", f"starting {tor_dir} subprocess")
+        log_msg("Onion", "connect", f"starting {tor_dir} subprocess")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=tor_cfg,
@@ -54,7 +38,7 @@ class ClientServer():
         except KeyboardInterrupt:
             print("\nExiting...")
             self.kill_tor()
-            self.log("Tor", "killed tor subprocess")
+            log_msg("Tor", "killed tor subprocess")
             exit(0)
 
     def kill_tor(self):
