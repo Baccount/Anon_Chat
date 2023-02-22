@@ -2,7 +2,7 @@ import threading
 import json
 import os
 from cmd import Cmd
-from onion_tor import CreateOnion
+from .server_tor import CreateOnion
 
 class Server(Cmd):
     """

@@ -1,39 +1,65 @@
 from server.server import Server
 import os
-import subprocess
-from time import sleep
-import psutil
+from stem.process import launch_tor_with_config
+import time
+import colorama
+from colorama import Fore, Back, Style
 
-# check if brew is installed and install if not on mac
-try:
-    subprocess.check_output(['brew', '--version'])
-except subprocess.CalledProcessError:
-    print("Brew is not installed, installing now...")
-    os.system("/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"")
+verbose = True
+# path to the tor binary
+tor_dir = os.getcwd() + '/tor/tor'
+obsf4 = os.getcwd() + '/tor/obfs4proxy'
+# create a new Tor configuration
+tor_cfg = {
+    'SocksPort': '9050',
+    'ControlPort': '9051',
+    'CookieAuthentication': '1',
+    'ClientTransportPlugin': 'obfs4 exec {0}'.format(obsf4),
+    'Bridge': 'obfs4 [2a0c:4d80:42:702::1]:27015 C5B7CD6946FF10C5B3E89691A7D3F2C122D2117C cert=TD7PbUO0/0k6xYHMPW3vJxICfkMZNdkRrb63Zhl5j9dW3iRGiCx0A7mPhe5T2EDzQ35+Zw iat-mode=0'
+}
+class StartServer():
+    def __init__(self):
+        pass
+
+    def log(self, module, func, msg=None):
+        """
+        If verbose mode is on, log error messages to stdout
+        """
+        if verbose:
+            timestamp = time.strftime("%b %d %Y %X")
+            final_msg = f"{Fore.LIGHTBLACK_EX + Style.DIM}[{timestamp}]{Style.RESET_ALL} {Fore.WHITE + Style.DIM}{module}.{func}{Style.RESET_ALL}"
+            if msg:
+                final_msg = (
+                    f"{final_msg}{Fore.WHITE + Style.DIM}: {msg}{Style.RESET_ALL}"
+                )
+            print(final_msg)
+    def start(self):
+        # start Tor with the new configuration if tor is not running
+        self.log("Onion", "connect", f"starting {tor_dir} subprocess")
+        try:
+            self.tor_bin = launch_tor_with_config(
+                config=tor_cfg,
+                tor_cmd=tor_dir,  # path to your tor binary
+                timeout=60
+            )
+        except Exception as e:
+            print(e)
+        try:
+            server = Server()
+            server.start()
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            self.kill_tor()
+            self.log("Tor", "killed tor subprocess")
+            exit(0)
+    def kill_tor(self):
+        try:
+            self.tor_bin.kill()
+        except Exception as e:
+            print(e)
 
 
-try:
-    subprocess.check_output(['which', 'tor'])
-except subprocess.CalledProcessError:
-    print('Tor is not installed')
-    os.system("brew install tor")
 
-# check if tor is running and start if not
-
-try:
-    subprocess.check_output(['which', 'tor'])
-except subprocess.CalledProcessError:
-    print('Tor is not installed')
-    os.system("brew install tor")
-
-# Check if Tor is running
-for proc in psutil.process_iter():
-    if proc.name() == 'tor':
-        print('Tor is running')
-        break
-else:
-    print('Tor is not running')
-    os.system("brew services restart tor")
-    sleep(5)
-server = Server()
-server.start()
+if __name__ == '__main__':
+    server = StartServer()
+    server.start()
