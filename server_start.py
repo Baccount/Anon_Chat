@@ -37,7 +37,7 @@ class StartServer():
         # start Tor with the new configuration if tor is not running
         self.log("Onion", "connect", f"starting {tor_dir} subprocess")
         try:
-            tor_bin = launch_tor_with_config(
+            self.tor_bin = launch_tor_with_config(
                 config=tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
                 timeout=60
@@ -49,9 +49,14 @@ class StartServer():
             server.start()
         except KeyboardInterrupt:
             print("\nExiting...")
-            tor_bin.kill()
+            self.kill_tor()
             self.log("Tor", "killed tor subprocess")
             exit(0)
+    def kill_tor(self):
+        try:
+            self.tor_bin.kill()
+        except Exception as e:
+            print(e)
 
 
 
