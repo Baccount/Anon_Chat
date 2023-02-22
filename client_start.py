@@ -35,6 +35,8 @@ class ClientServer():
                     f"{final_msg}{Fore.WHITE + Style.DIM}: {msg}{Style.RESET_ALL}"
                 )
             print(final_msg)
+
+
     def start(self):
         # start Tor with the new configuration if tor is not running
         self.log("Onion", "connect", f"starting {tor_dir} subprocess")
@@ -54,6 +56,7 @@ class ClientServer():
             self.kill_tor()
             self.log("Tor", "killed tor subprocess")
             exit(0)
+
     def kill_tor(self):
         try:
             self.tor_bin.kill()
