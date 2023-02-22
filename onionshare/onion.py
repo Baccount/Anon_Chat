@@ -276,6 +276,7 @@ class Onion(object):
                 torrc_template += "ControlPort {{control_port}}\n"
                 try:
                     self.tor_control_port = self.common.get_available_port(1000, 65535)
+                    
                 except Exception:
                     print("OnionShare port not available")
                     raise PortNotAvailable()
@@ -315,6 +316,7 @@ class Onion(object):
             torrc_template = torrc_template.replace(
                 "{{snowflake_path}}", str(self.snowflake_file_path)
             )
+            self.common.log("Tor", torrc_template)
 
             with open(self.tor_torrc, "w") as f:
                 self.common.log("Onion", "connect", "Writing torrc template file")
@@ -667,7 +669,11 @@ class Onion(object):
             and self.settings.get("bridges_type") == "built-in"
         ):
             self.update_builtin_bridges()
-
+    def get_control_port(self):
+        """
+        Return the control port number.
+        """
+        return self.tor_control_port
     def is_authenticated(self):
         """
         Returns True if the Tor connection is still working, or False otherwise.
