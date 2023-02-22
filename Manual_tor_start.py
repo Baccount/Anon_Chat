@@ -6,7 +6,7 @@ import os
 def main():
 
     # path to the tor binary
-    tor_dir = os.getcwd() + '/tor_bin/tor'
+    tor_dir = os.getcwd() + '/tor/tor'
     # create a new Tor configuration
     tor_cfg = {
         'SocksPort': '9050',
