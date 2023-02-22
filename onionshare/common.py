@@ -359,12 +359,18 @@ class Common:
             base_path = self.get_resource_path("tor")
             base_path = base_path.replace("onionshare_cli", "onionshare")
             tor_path = os.path.join(base_path, "tor")
+            # set the tor_path to /Users/brandon/Anon_Chat/onionshare/resources/tor/tor
+            # TODO: delete this
+            tor_path = "/Users/brandon/Anon_Chat/onionshare/resources/tor/tor"
+            base_path = "/Users/brandon/Anon_Chat/onionshare/resources/tor"
+            
             if os.path.exists(tor_path):
                 obfs4proxy_file_path = os.path.join(base_path, "obfs4proxy")
                 snowflake_file_path = os.path.join(base_path, "snowflake-client")
                 meek_client_file_path = os.path.join(base_path, "meek-client")
                 tor_geo_ip_file_path = os.path.join(base_path, "geoip")
                 tor_geo_ipv6_file_path = os.path.join(base_path, "geoip6")
+                print(obfs4proxy_file_path)
             else:
                 # Fallback to looking in the path
                 tor_path = shutil.which("tor")
