@@ -22,6 +22,12 @@ class Server(Cmd):
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+        self.onion_address = None
+
+    def do_o(self, args):
+        # print the onion address
+        onion = self.g(self.onion_address) + self.g(".onion")
+        print(f"{onion}")
 
     def do_ban(self, args):
         """
@@ -32,7 +38,7 @@ class Server(Cmd):
         try:
             if int(args) == 0:
                 print('Cannot ban server because it is the server!')
-                log_msg("do_ban", f"Cannot ban server because it is the server! {arg} is the server")
+                log_msg("do_ban", f"Cannot ban server because it is the server! {args} is the server")
                 return
             self.ban_user(user_id=int(args))
         except Exception as e:
@@ -270,7 +276,7 @@ class Server(Cmd):
 
         print('[Server] server is running......')
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
-
+        self.onion_address = response.service_id
 
         self.__connections.append(None)
         self.__nicknames.append('\033[92m' + 'Server' + '\033[0m')
