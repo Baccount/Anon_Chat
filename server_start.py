@@ -20,13 +20,15 @@ tor_cfg = {
     'GeoIPFile': f'{geo_ip_file}',
     'GeoIPv6File': f'{geo_ipv6_file}',
 }
+log_msg("StartServer", "SocksPort", f"{tor_cfg['SocksPort']}")
+log_msg("StartServer", "ControlPort", f"{tor_cfg['ControlPort']}")
 class StartServer():
     def __init__(self):
         pass
 
     def start(self):
         # start Tor with the new configuration if tor is not running
-        log_msg("Onion", "connect", f"starting {tor_dir} subprocess")
+        log_msg("Onion", "connect", f"starting tor bin {tor_dir}")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=tor_cfg,

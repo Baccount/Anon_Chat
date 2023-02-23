@@ -3,6 +3,7 @@ import json
 import os
 from cmd import Cmd
 from .server_tor import CreateOnion
+from logging_msg import log_msg
 
 class Server(Cmd):
     """
