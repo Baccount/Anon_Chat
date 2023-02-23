@@ -3,6 +3,7 @@ import json
 import os
 from cmd import Cmd
 from .server_tor import CreateOnion
+from logging_msg import log_msg
 
 class Server(Cmd):
     """
@@ -21,6 +22,12 @@ class Server(Cmd):
         self.__connections = list()
         self.__nicknames = list()
         self.__lock = threading.Lock()
+        self.onion_address = None
+
+    def do_o(self, args):
+        # print the onion address
+        onion = self.g(self.onion_address) + self.g(".onion")
+        print(f"{onion}")
 
     def do_ban(self, args):
         """
@@ -31,6 +38,7 @@ class Server(Cmd):
         try:
             if int(args) == 0:
                 print('Cannot ban server because it is the server!')
+                log_msg("do_ban", f"Cannot ban server because it is the server! {args} is the server")
                 return
             self.ban_user(user_id=int(args))
         except Exception as e:
@@ -46,8 +54,7 @@ class Server(Cmd):
             for i in range(len(self.__connections)):
                 print(f'{i} : {self.__nicknames[i]}')
         except Exception as e:
-            print('server line 51')
-            print(e)
+            log_msg("do_l", f"Error: {e}")
 
 
     def do_s(self, args):
@@ -75,8 +82,7 @@ class Server(Cmd):
             self.__connections[user_id] = None
             self.__nicknames[user_id] = None
         except Exception as e:
-            print('server line 81')
-            print(e)
+            log_msg("ban_user", f"Error: {e}")
 
 
 
@@ -95,10 +101,11 @@ class Server(Cmd):
             self.__connections[user_id] = None
             self.__nicknames[user_id] = None
         except Exception as e:
-            print('server line 77')
-            print(e)
+            log_msg("disconnectUsr", f"Error: {e}")
 
-
+    def g(self, text):
+        # return green text
+        return '\033[92m' + text + '\033[0m'
 
     def separateJson(self, buffer):
         """
@@ -124,7 +131,7 @@ class Server(Cmd):
             start = end
             end = buffer.find('{', start)
             # Process each JSON object
-            print(f'objects {objects}')
+            log_msg("separateJson", f"objects: {objects}")
             return objects
 
 
@@ -141,7 +148,7 @@ class Server(Cmd):
             self.__broadcast(message=f'user {nickname} ({user_id}) has exited the chat room')
             self.disconnectUsr(user_id, nickname)
         else:
-            print('server line 96')
+            log_msg("decode_buffer", f"Unknown object type: {obj['type']}")
             self.disconnectUsr(user_id, nickname)
 
     def __user_thread(self, user_id):
@@ -151,13 +158,13 @@ class Server(Cmd):
         """
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
-        print(f'[Server] user {user_id} ({nickname}) joined the chat room')
+        log_msg("__user_thread", f'[Server] user {user_id} ({nickname}) joined the chat room')
 
         while True:
             try:
                 buffer = b''
                 chunk = connection.recv(1024)
-                print(f"chunk: {chunk}")
+                log_msg("__user_thread", f"chunk: {chunk}")
 
                 if chunk:
                     buffer += chunk
@@ -166,7 +173,7 @@ class Server(Cmd):
                     break
 
                 buffer = self.decode_buffer(buffer)
-                print(f"buffer: {buffer}")
+                log_msg("__user_thread", f"buffer: {buffer}")
 
                 objects = self.separateJson(buffer)
 
@@ -175,8 +182,8 @@ class Server(Cmd):
                         obj = json.loads(obj)
                         self.handle_obj(obj, user_id, nickname)
             except Exception as e:
-                print('server line 177')
-                print(e)
+                log_msg("__user_thread", f"Error: {e}")
+                log_msg("__user_thread", f"Disconnected user {user_id} ({nickname})")
                 self.disconnectUsr(user_id, nickname)
                 break
 
@@ -190,6 +197,7 @@ class Server(Cmd):
         # Acquire the lock to prevent multiple broadcasts from running simultaneously
         self.__lock.acquire()
         try:
+            log_msg("__broadcast", f"Message: {message}")
             for i in range(len(self.__connections)):
                 if user_id != i and self.__connections[i]:
                     self.__connections[i].send(json.dumps({
@@ -210,7 +218,7 @@ class Server(Cmd):
         try:
             while True:
                 buffer = connection.recv(1024).decode()
-                print(buffer)
+                log_msg("__waitForLogin", f"buffer: {buffer}")
                 obj = json.loads(buffer)
                 if obj['type'] == 'login':
                     # check if the nickname is already in use
@@ -232,8 +240,8 @@ class Server(Cmd):
                     break
 
         except Exception as e:
-            print('Client Disconnected, server line 158')
-            print(e)
+            log_msg("__waitForLogin", f"Error: {e}")
+            log_msg("__waitForLogin", f"Disconnected user {len(self.__connections) - 1} ({obj['nickname']})")
             connection.close()
 
 
@@ -246,6 +254,7 @@ class Server(Cmd):
         if os.path.exists(key_path):
             os.remove(key_path)
             print("Private key deleted")
+            log_msg("delete_private_key", f"Deleted {key_path}")
 
     def start(self):
         """
@@ -266,8 +275,8 @@ class Server(Cmd):
 
 
         print('[Server] server is running......')
-        print(f"Onion Service: {response.service_id}.onion")
-
+        print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
+        self.onion_address = response.service_id
 
         self.__connections.append(None)
         self.__nicknames.append('\033[92m' + 'Server' + '\033[0m')
@@ -277,7 +286,7 @@ class Server(Cmd):
         cmdThread.start()
         while True:
             connection, address = self.tor.socket.accept()
-            print('[Server] received a new connection', connection.getsockname(), connection.fileno())
+            log_msg("start", f"[Server] received a new connection', {connection.getsockname()}, {connection.fileno()}")
 
             thread = threading.Thread(target=self.__waitForLogin, args=(connection,))
             thread.setDaemon(True)
