@@ -2,6 +2,7 @@ import threading
 import json
 from cmd import Cmd
 from .connect_tor import Tor
+from logging_msg import log_msg
 
 
 class Client(Cmd):
@@ -31,15 +32,14 @@ class Client(Cmd):
                 buffer = self.tor.socket.recv(1024).decode()
                 stripped = self.decode(buffer)
                 if not stripped:
-                    print('[Client] Server offline, exiting LINE 37')
+                    log_msg("__receive_message_thread","Message not stripped")
                     exit()
                     break
                 for i in stripped:
                     obj = json.loads(i)
                     print('[' + str(obj['sender_nickname']) + ']', obj['message'])
             except Exception as e:
-                print('client line 38')
-                print('[Client] Unable to get data from server', e)
+                log_msg("__receive_message_thread","Exception ", e)
                 self.__isLogin = False
                 break
 
@@ -82,10 +82,10 @@ class Client(Cmd):
                 'message': message
             }).encode())
         except BrokenPipeError as e:
-            print(f'{e} client line 86')
+            log_msg("__send_message_thread", "BrokenPipeError", e)
             exit(0)
         except Exception as e:
-            print('client line 87')
+            log_msg("__send_message_thread", "Exception ", e)
             print(e)
 
     def start(self):
@@ -122,23 +122,25 @@ class Client(Cmd):
                     # if id = -1 means the nickname is already in use
                     if obj['id'] == -1:
                         print('[Client] The nickname is already in use')
+                        log_msg("do_login", "The nickname is already in use")
                         return
                     self.__nickname = nickname
                     self.__id = obj['id']
                     self.__isLogin = True
                     print('[Client] Successfully logged into the chat room')
+                    log_msg("do_login", "Successfully logged into the chat room")
 
 
                     thread = threading.Thread(target=self.__receive_message_thread)
                     thread.setDaemon(True)
                     thread.start()
             except Exception as e:
-                print('client line 138')
-                print(e)
                 print("Server likely down")
+                log_msg("do_login", "Exception ", e)
                 exit(0)
         else:
             print('[Client] You have already logged in')
+            log_msg("do_login", "You have already logged in")
 
     def do_s(self, args):
         """
@@ -157,6 +159,7 @@ class Client(Cmd):
             thread.start()
         else:
             print('[Client] You have not logged in yet')
+            log_msg("do_s", "You have not logged in yet")
 
     def do_logout(self, args=None):
         """
@@ -167,6 +170,7 @@ class Client(Cmd):
             'sender_id': self.__id
         }).encode())
         self.__isLogin = False
+        log_msg("do_logout", "You have logged out")
         return True
 
     def do_help(self, arg):
