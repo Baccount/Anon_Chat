@@ -29,7 +29,7 @@ class ClientServer():
 
     def start(self):
         # start Tor with the new configuration if tor is not running
-        log_msg("Onion", "connect", f"starting {tor_dir} subprocess")
+        log_msg("Client_Start", "start", f"starting {tor_dir}")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=tor_cfg,
@@ -42,14 +42,15 @@ class ClientServer():
             client = Client()
             client.start()
         except KeyboardInterrupt:
+            log_msg("Client_Start", "start", "keyboard interrupt")
             print("\nExiting...")
             self.kill_tor()
-            log_msg("Tor", "killed tor subprocess")
             exit(0)
 
     def kill_tor(self):
         try:
             self.tor_bin.kill()
+            log_msg("Client_Start","kill_tor", "killed tor subprocess")
         except Exception as e:
             print(e)
 
