@@ -37,7 +37,8 @@ class ClientServer():
                 timeout=60
             )
         except Exception as e:
-            print(e)
+            # tor is already running
+            log_msg("ClientServer","start" ,f"Error: {e}")
         try:
             client = Client()
             client.start()
@@ -45,7 +46,7 @@ class ClientServer():
             log_msg("Client_Start", "start", "keyboard interrupt")
             print("\nExiting...")
             self.kill_tor()
-            exit(0)
+            exit(1)
 
     def kill_tor(self):
         try:

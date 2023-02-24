@@ -43,7 +43,7 @@ class StartServer():
             print("\nExiting...")
             self.kill_tor()
             log_msg("Tor", "killed tor subprocess")
-            exit(0)
+            exit(1)
 
     def kill_tor(self):
         try:
