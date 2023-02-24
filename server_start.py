@@ -33,7 +33,6 @@ class StartServer():
             self.tor_bin = launch_tor_with_config(
                 config=tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout=60,
             )
         except Exception as e:
             print(e)

@@ -2,6 +2,7 @@ import socket
 from random import randint
 from stem.control import Controller
 from logging_msg import log_msg
+import subprocess
 
 import os
 
@@ -16,13 +17,40 @@ class BundledTorCanceled(Exception):
 class CreateOnion():
 
     def __init__(self):
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.port = randint(10000, 65535)
+            self.controller = Controller.from_port(port=9051)
+            self.controller.authenticate()
+            self.socket.bind(("127.0.0.1", self.port))
+            self.socket.listen(10)
+        except Exception as e:
+            print(e)
+            self.force_kill_tor()
+            exit(1)
 
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.port = randint(10000, 65535)
-        self.controller = Controller.from_port(port=9051)
-        self.controller.authenticate()
-        self.socket.bind(("127.0.0.1", self.port))
-        self.socket.listen(10)
+    def force_kill_tor(self):
+        """
+        Force kill the tor process
+        """
+        try:
+            log_msg("force_kill_tor", "Killing tor subprocess")
+            # Find the process IDs (PIDs) of the processes with the given name
+            pid_command = ["pgrep", "-x", "tor"]
+            pid_process = subprocess.Popen(pid_command, stdout=subprocess.PIPE)
+            pid_output, _ = pid_process.communicate()
+            pids = pid_output.decode().strip().split("\n")
+            # Kill each process with the found PIDs
+            if pids:
+                for pid in pids:
+                    kill_command = ["kill", pid]
+                    subprocess.run(kill_command)
+                    print(f"Process tor (PID {pid}) killed.")
+            else:
+                print("No process named tor found.")
+
+        except Exception as e:
+            print(e)
 
 
     def ephemeral_onion(self):
