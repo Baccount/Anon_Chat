@@ -25,7 +25,7 @@ class CreateOnion():
             self.socket.bind(("127.0.0.1", self.port))
             self.socket.listen(10)
         except Exception as e:
-            print(e)
+            log_msg("CreateOnion", "__init__", f"Error: {e}")
             self.force_kill_tor()
             exit(1)
 
