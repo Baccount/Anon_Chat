@@ -1,5 +1,6 @@
 from server.server import Server
 import os
+import subprocess
 from stem.process import launch_tor_with_config
 from logging_msg import log_msg
 
@@ -41,13 +42,29 @@ class StartServer():
             server.start()
         except KeyboardInterrupt:
             print("\nExiting...")
-            self.kill_tor()
+            self.force_kill_tor()
             log_msg("Tor", "killed tor subprocess")
             exit(1)
 
-    def kill_tor(self):
+    def force_kill_tor(self):
+        """
+        Force kill the tor process
+        """
         try:
-            self.tor_bin.kill()
+            log_msg("force_kill_tor", "Killing tor subprocess")
+            # Find the process IDs (PIDs) of the processes with the given name
+            pid_command = ["pgrep", "-x", "tor"]
+            pid_process = subprocess.Popen(pid_command, stdout=subprocess.PIPE)
+            pid_output, _ = pid_process.communicate()
+            pids = pid_output.decode().strip().split("\n")
+            # Kill each process with the found PIDs
+            if pids:
+                for pid in pids:
+                    kill_command = ["kill", pid]
+                    subprocess.run(kill_command)
+                    print(f"Process tor (PID {pid}) killed.")
+            else:
+                print("No process named tor found.")
         except Exception as e:
             print(e)
 
