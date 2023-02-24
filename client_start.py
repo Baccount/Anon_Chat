@@ -11,11 +11,13 @@ obsf4 = os.getcwd() + '/tor/obfs4proxy'
 geo_ip_file = os.getcwd() + '/tor/geoip'
 geo_ipv6_file = os.getcwd() + '/tor/geoip6'
 # create a new Tor configuration
+# 'Bridge': 'obfs4 [2a0c:4d80:42:702::1]:27015 C5B7CD6946FF10C5B3E89691A7D3F2C122D2117C cert=TD7PbUO0/0k6xYHMPW3vJxICfkMZNdkRrb63Zhl5j9dW3iRGiCx0A7mPhe5T2EDzQ35+Zw iat-mode=0',
 tor_cfg = {
     'SocksPort': '9050',
     'ControlPort': '9051',
     'CookieAuthentication': '1',
     'ClientTransportPlugin': f'obfs4 exec {obsf4}',
+    'UseBridges': '1',
     'Bridge': 'obfs4 [2a0c:4d80:42:702::1]:27015 C5B7CD6946FF10C5B3E89691A7D3F2C122D2117C cert=TD7PbUO0/0k6xYHMPW3vJxICfkMZNdkRrb63Zhl5j9dW3iRGiCx0A7mPhe5T2EDzQ35+Zw iat-mode=0',
     'AvoidDiskWrites': '1',
     'Log': 'notice stdout',

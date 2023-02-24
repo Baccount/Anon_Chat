@@ -11,7 +11,6 @@ class Tor(object):
             socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
             socket.socket = socks.socksocket
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            log_msg("__init__", f"Connected to Socket {self.socket}")
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
             self.force_kill_tor()
