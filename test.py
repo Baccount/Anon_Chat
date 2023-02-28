@@ -3,9 +3,10 @@ from bridges.downloadbridges import DownloadBridges
 def main():
     db = DownloadBridges()
     db.getCaptcha()
-
     db.display_image()
-    db.checkCaptcha()
+    if not db.checkCaptcha():
+        print("Captcha is incorrect")
+        main()
     bridges = db.getBridges()
     print(bridges)
     db.cleanup()

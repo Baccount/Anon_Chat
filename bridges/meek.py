@@ -101,7 +101,6 @@ class Meek():
         return self.meek_proxies
 
     def cleanup(self):
-        print("cleanup")
         """
         Kill any meek subprocesses.
         """

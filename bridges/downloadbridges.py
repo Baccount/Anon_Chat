@@ -26,25 +26,28 @@ class DownloadBridges:
 
 
     def getCaptcha(self):
-        log_msg("DownloadBridges", "getBridge", "Getting bridge")
-        captcha = requests.post(
-            "https://bridges.torproject.org/moat/fetch",
-            headers={"Content-Type": "application/vnd.api+json"},
-            proxies=self.meek_proxies,
-            json={
-                "data": [
-                    {
-                        "version": "0.1.0",
-                        "type": "client-transports",
-                        "supported": ["obfs4", "snowflake"],
-                    }
-                ]
-            },
-        )
-        moat_res = captcha.json()
-        self.transport = moat_res["data"][0]["transport"]
-        self.image = moat_res["data"][0]["image"]
-        self.challenge = moat_res["data"][0]["challenge"]
+        try:
+            log_msg("DownloadBridges", "getBridge", "Getting bridge")
+            captcha = requests.post(
+                "https://bridges.torproject.org/moat/fetch",
+                headers={"Content-Type": "application/vnd.api+json"},
+                proxies=self.meek_proxies,
+                json={
+                    "data": [
+                        {
+                            "version": "0.1.0",
+                            "type": "client-transports",
+                            "supported": ["obfs4", "snowflake"],
+                        }
+                    ]
+                },
+            )
+            moat_res = captcha.json()
+            self.transport = moat_res["data"][0]["transport"]
+            self.image = moat_res["data"][0]["image"]
+            self.challenge = moat_res["data"][0]["challenge"]
+        except Exception as e:
+            log_msg("DownloadBridges", "getBridge", f"Error: {e}")
 
     def display_image(self):
 
@@ -68,27 +71,41 @@ class DownloadBridges:
         """
         Check the Captcha and return True if it is correct
         """
-        log_msg("DownloadBridges", "checkCaptcha", "Checking Captcha")
-        self.bridge = requests.post(
-            "https://bridges.torproject.org/moat/check",
-            headers={"Content-Type": "application/vnd.api+json"},
-            proxies=self.meek_proxies,
-            json={
-                "data": [
-                    {
-                        "id": "2",
-                        "type": "moat-solution",
-                        "version": "0.1.0",
-                        "transport": self.transport,
-                        "challenge": self.challenge,
-                        "solution": input("Enter the solution: "),
-                        "qrcode": "false",
-                    }
-                ]
-            },
-        )
-        log_msg("display_image","on_close", "Closing the window")
-        plt.close()
+        try:
+            log_msg("DownloadBridges", "checkCaptcha", "Checking Captcha")
+            self.bridge = requests.post(
+                "https://bridges.torproject.org/moat/check",
+                headers={"Content-Type": "application/vnd.api+json"},
+                proxies=self.meek_proxies,
+                json={
+                    "data": [
+                        {
+                            "id": "2",
+                            "type": "moat-solution",
+                            "version": "0.1.0",
+                            "transport": self.transport,
+                            "challenge": self.challenge,
+                            "solution": input("Enter the solution: "),
+                            "qrcode": "false",
+                        }
+                    ]
+                },
+            )
+            log_msg("display_image","on_close", "Closing the window")
+            plt.close()
+        except Exception as e:
+            log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
+            return False
+        # If data is present, then the captcha is correct
+        try:
+            data = self.bridge.json()["data"]
+            if not data:
+                log_msg("DownloadBridges", "checkCaptcha", "Error: ")
+                return False
+        except Exception as e:
+            log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
+            return False
+        return True
 
     def getBridges(self):
         """
