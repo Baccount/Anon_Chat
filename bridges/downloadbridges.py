@@ -42,31 +42,19 @@ class DownloadBridges:
         self.image = moat_res["data"][0]["image"]
         self.challenge = moat_res["data"][0]["challenge"]
 
-        # render base64 image to png
-        # import base64
-        # with open("bridge.png", "wb") as fh:
-        #     fh.write(base64.b64decode(image))
-
     def display_image(self):
 
-        # Define the function to handle window closing event
+        # Handle window closing event
         def on_close(event):
             plt.close()
 
-        # Base64 encoded image data
         img_data = self.image
         # Convert Base64 data to image
         img_bytes = base64.b64decode(img_data)
         img = Image.open(io.BytesIO(img_bytes))
-
-        # Create Matplotlib figure and axis
         fig, ax = plt.subplots()
-
-        # Display the image on the axis
         ax.imshow(img)
-        # Connect the close_event of the figure to the callback function
         fig.canvas.mpl_connect('close_event', on_close)
-
         # Show the Matplotlib figure without blocking
         plt.show(block=False)
 
