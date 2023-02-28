@@ -17,6 +17,10 @@ class DownloadBridges:
         self.meek = Meek(self.meek_path)
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
+        
+        # cleanup meek when the program exits
+        import atexit
+        atexit.register(self.meek.cleanup)
 
 
 
@@ -94,3 +98,9 @@ class DownloadBridges:
         for item in self.bridge.json()['data']:
             bridges.extend(item['bridges'])
         return bridges
+
+    def cleanup(self):
+        """
+        Cleanup the meek process
+        """
+        self.meek.cleanup()

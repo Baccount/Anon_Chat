@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import subprocess
 import time
+from logging_msg import log_msg
 
 
 class Meek():
@@ -35,7 +36,6 @@ class Meek():
         Set up the Meek object
         """
         self.meek_path = meek_path
-        print("meek_path: ", meek_path)
 
 
 
@@ -101,6 +101,7 @@ class Meek():
         return self.meek_proxies
 
     def cleanup(self):
+        print("cleanup")
         """
         Kill any meek subprocesses.
         """
@@ -109,7 +110,7 @@ class Meek():
             self.meek_proc.terminate()
             time.sleep(0.2)
             if self.meek_proc.poll() is None:
-                self.common.log(
+                log_msg(
                     "Meek",
                     "cleanup",
                     "Tried to terminate meek-client process but it's still running",
@@ -118,13 +119,13 @@ class Meek():
                     self.meek_proc.kill()
                     time.sleep(0.2)
                     if self.meek_proc.poll() is None:
-                        self.common.log(
+                        log_msg(
                             "Meek",
                             "cleanup",
                             "Tried to kill meek-client process but it's still running",
                         )
                 except Exception:
-                    self.common.log(
+                    log_msg(
                         "Meek", "cleanup", "Exception while killing meek-client process"
                     )
             self.meek_proc = None
@@ -145,7 +146,7 @@ class MeekNotRunning(Exception):
         msg = "Meek experienced an error starting up"
         if info:
             msg = msg + f": {info}"
-        self.common.log("MeekNotRunning", "__init__", msg)
+        log_msg("MeekNotRunning", "__init__", msg)
 
 
 class MeekNotFound(Exception):
@@ -155,4 +156,4 @@ class MeekNotFound(Exception):
 
     def __init__(self, common):
         self.common = common
-        self.common.log("MeekNotFound", "__init__", "Could not find the meek binary")
+        log_msg("MeekNotFound", "__init__", "Could not find the meek binary")
