@@ -10,6 +10,9 @@ from .meek import Meek
 
 class DownloadBridges:
     def __init__(self):
+        pass
+
+    def connectMeek(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
         log_msg("DownloadBridges", "__init__", "Meek path: " + self.meek_path)
 
@@ -18,6 +21,7 @@ class DownloadBridges:
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
 
     def getCaptcha(self):
+        self.connectMeek()
         try:
             log_msg("DownloadBridges", "getBridge", "Getting bridge")
             captcha = requests.post(

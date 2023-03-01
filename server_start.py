@@ -25,7 +25,7 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        # TODO Improve this
+
         choice = input("Use bridges? (y/n) ")
         if choice == "y" or choice == "Y":
             self.use_bridges()
@@ -73,18 +73,23 @@ class StartServer:
         except Exception as e:
             print(e)
 
-    def use_bridges(self):
-        # return the new configuration with bridges
-        db = DownloadBridges()
-        db.getCaptcha()
-        db.display_image()
-        if not db.checkCaptcha():
-            print("Captcha is incorrect")
-            self.use_bridges()
-        db.saveBridges()
-        db.cleanup()
-        obsf4Bridges = db.readBridges()
 
+
+    def use_bridges(self):
+        # If bridges.json does not exist, download bridges
+        if not os.path.exists("bridges.json"):
+            db = DownloadBridges()
+            db.getCaptcha()
+            db.display_image()
+            if not db.checkCaptcha():
+                print("Captcha is incorrect")
+                self.use_bridges()
+            db.saveBridges()
+            db.cleanup()
+            obsf4Bridges = db.readBridges()
+        else:
+            db = DownloadBridges()
+            obsf4Bridges = db.readBridges()
         self.tor_cfg = {
             "SocksPort": "9050",
             "ControlPort": "9051",
