@@ -4,20 +4,13 @@ import subprocess
 from stem.process import launch_tor_with_config
 from logging_msg import log_msg
 from bridges.downloadbridges import DownloadBridges
-import matplotlib.pyplot as plt
-from PIL import Image
-import base64
-import io
+
 
 # path to the tor binary
 tor_dir = os.getcwd() + '/tor/tor'
 obsf4 = os.getcwd() + '/tor/obfs4proxy'
 geo_ip_file = os.getcwd() + '/tor/geoip'
 geo_ipv6_file = os.getcwd() + '/tor/geoip6'
-# create a new Tor configuration
-    # 'ClientTransportPlugin': f'obfs4 exec {obsf4}',
-    # 'Bridge': 'obfs4 51.15.9.232:80 D0C9F8AA6E940FA536E7D694EFE67F9DEAF7E4E0 cert=Nw7pKQvtWh2VapurRDPtnf8Z3eIykwqnZXEpqD68Vxfee8C03K2Z3krZ79s74Ixxs7ZsJw iat-mode=0',
-
 
 
 class StartServer():
@@ -80,20 +73,11 @@ class StartServer():
 
 
 
-    def display_image(self, imagedata):
-        # Convert Base64 data to image
-        img_bytes = base64.b64decode(imagedata)
-        img = Image.open(io.BytesIO(img_bytes))
-        fig, ax = plt.subplots()
-        ax.imshow(img)
-        # Show the Matplotlib figure without blocking
-        plt.show(block=False)
-
     def use_bridges(self):
+        # return the new configuration with bridges
         db = DownloadBridges()
         db.getCaptcha()
-        imagedata = db.image
-        self.display_image(imagedata)
+        db.display_image()
         if not db.checkCaptcha():
             print("Captcha is incorrect")
             self.use_bridges()

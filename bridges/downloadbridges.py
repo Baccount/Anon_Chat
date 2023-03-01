@@ -2,17 +2,11 @@ from .meek import Meek
 import requests
 from logging_msg import log_msg
 import os
-import base64
 import io
 import matplotlib.pyplot as plt
 from PIL import Image
 import json
-import logging
-
-# Set the logging level to DEBUG
-logging.basicConfig(level=logging.DEBUG)
-
-
+import base64
 class DownloadBridges:
     def __init__(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
@@ -22,9 +16,7 @@ class DownloadBridges:
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
         
-        # cleanup meek when the program exits
-        import atexit
-        atexit.register(self.meek.cleanup)
+
 
 
 
@@ -53,17 +45,15 @@ class DownloadBridges:
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
 
+
     def display_image(self):
-        img_data = self.image
-        # Convert Base64 data to image
-        img_bytes = base64.b64decode(img_data)
-        img = Image.open(io.BytesIO(img_bytes))
-        fig, ax = plt.subplots()
-        ax.imshow(img)
-        # Show the Matplotlib figure without blocking
-        plt.show(block=False)
-
-
+        try:
+            base64_image_data = self.image
+            image_data = base64.b64decode(base64_image_data)
+            image = Image.open(io.BytesIO(image_data))
+            image.show()
+        except Exception as e:
+            log_msg("DownloadBridges", "display_image", f"Error: {e}")
 
     def checkCaptcha(self):
         """
@@ -90,7 +80,6 @@ class DownloadBridges:
                 },
             )
             log_msg("display_image","on_close", "Closing the window")
-            plt.close()
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
