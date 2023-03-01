@@ -2,13 +2,9 @@ import base64
 import io
 import json
 import os
-
-import matplotlib.pyplot as plt
 import requests
 from PIL import Image
-
 from logging_msg import log_msg
-
 from .meek import Meek
 
 
