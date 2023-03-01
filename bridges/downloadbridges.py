@@ -6,7 +6,7 @@ import base64
 import io
 import matplotlib.pyplot as plt
 from PIL import Image
-
+import json
 
 
 class DownloadBridges:
@@ -105,6 +105,8 @@ class DownloadBridges:
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
+        log_msg("DownloadBridges","checkCaptcha",  "Captcha is correct")
+        log_msg("Bridges", data)
         return True
 
     def getBridges(self):
@@ -121,3 +123,21 @@ class DownloadBridges:
         Cleanup the meek process
         """
         self.meek.cleanup()
+
+    def saveBridges(self):
+        """
+        Save the bridges to a file
+        """
+        log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
+        bridge_lst = self.getBridges()
+        with open('bridges.json', 'w') as f:
+            json.dump(bridge_lst, f)
+
+    def readBridges(self):
+        """
+        Read the bridges from a file
+        """
+        log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
+        with open('bridges.json', 'r') as f:
+            my_list = json.load(f)
+        return my_list

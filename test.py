@@ -1,4 +1,5 @@
 from bridges.downloadbridges import DownloadBridges
+import json
 
 def main():
     db = DownloadBridges()
@@ -7,9 +8,10 @@ def main():
     if not db.checkCaptcha():
         print("Captcha is incorrect")
         main()
-    bridges = db.getBridges()
-    print(bridges)
+    db.saveBridges()
     db.cleanup()
+    
+    print(db.readBridges())
 
 if __name__ == "__main__":
     main()
