@@ -1,31 +1,27 @@
-from .meek import Meek
-import requests
-from logging_msg import log_msg
-import os
 import base64
 import io
-import matplotlib.pyplot as plt
-from PIL import Image
 import json
+import os
+import requests
+from PIL import Image
+from logging_msg import log_msg
+from .meek import Meek
 
 
 class DownloadBridges:
     def __init__(self):
+        pass
+
+    def connectMeek(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
         log_msg("DownloadBridges", "__init__", "Meek path: " + self.meek_path)
 
         self.meek = Meek(self.meek_path)
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
-        
-        # cleanup meek when the program exits
-        import atexit
-        atexit.register(self.meek.cleanup)
-
-
-
 
     def getCaptcha(self):
+        self.connectMeek()
         try:
             log_msg("DownloadBridges", "getBridge", "Getting bridge")
             captcha = requests.post(
@@ -50,22 +46,13 @@ class DownloadBridges:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
 
     def display_image(self):
-
-        # Handle window closing event
-        def on_close(event):
-            plt.close()
-
-        img_data = self.image
-        # Convert Base64 data to image
-        img_bytes = base64.b64decode(img_data)
-        img = Image.open(io.BytesIO(img_bytes))
-        fig, ax = plt.subplots()
-        ax.imshow(img)
-        fig.canvas.mpl_connect('close_event', on_close)
-        # Show the Matplotlib figure without blocking
-        plt.show(block=False)
-
-
+        try:
+            base64_image_data = self.image
+            image_data = base64.b64decode(base64_image_data)
+            image = Image.open(io.BytesIO(image_data))
+            image.show()
+        except Exception as e:
+            log_msg("DownloadBridges", "display_image", f"Error: {e}")
 
     def checkCaptcha(self):
         """
@@ -91,8 +78,7 @@ class DownloadBridges:
                     ]
                 },
             )
-            log_msg("display_image","on_close", "Closing the window")
-            plt.close()
+            log_msg("display_image", "on_close", "Closing the window")
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
@@ -105,7 +91,7 @@ class DownloadBridges:
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
-        log_msg("DownloadBridges","checkCaptcha",  "Captcha is correct")
+        log_msg("DownloadBridges", "checkCaptcha", "Captcha is correct")
         log_msg("Bridges", data)
         return True
 
@@ -114,8 +100,8 @@ class DownloadBridges:
         Return the bridges
         """
         bridges = []
-        for item in self.bridge.json()['data']:
-            bridges.extend(item['bridges'])
+        for item in self.bridge.json()["data"]:
+            bridges.extend(item["bridges"])
         return bridges
 
     def cleanup(self):
@@ -130,7 +116,7 @@ class DownloadBridges:
         """
         log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
         bridge_lst = self.getBridges()
-        with open('bridges.json', 'w') as f:
+        with open("bridges.json", "w") as f:
             json.dump(bridge_lst, f)
 
     def readBridges(self):
@@ -138,6 +124,6 @@ class DownloadBridges:
         Read the bridges from a file
         """
         log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
-        with open('bridges.json', 'r') as f:
+        with open("bridges.json", "r") as f:
             my_list = json.load(f)
         return my_list

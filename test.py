@@ -1,5 +1,5 @@
 from bridges.downloadbridges import DownloadBridges
-import json
+
 
 def main():
     db = DownloadBridges()
@@ -10,8 +10,9 @@ def main():
         main()
     db.saveBridges()
     db.cleanup()
-    
-    print(db.readBridges())
+    obsf4Bridges = db.readBridges()
+    print(obsf4Bridges)
+
 
 if __name__ == "__main__":
     main()
