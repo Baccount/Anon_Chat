@@ -7,6 +7,10 @@ import io
 import matplotlib.pyplot as plt
 from PIL import Image
 import json
+import logging
+
+# Set the logging level to DEBUG
+logging.basicConfig(level=logging.DEBUG)
 
 
 class DownloadBridges:
@@ -50,18 +54,12 @@ class DownloadBridges:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
 
     def display_image(self):
-
-        # Handle window closing event
-        def on_close(event):
-            plt.close()
-
         img_data = self.image
         # Convert Base64 data to image
         img_bytes = base64.b64decode(img_data)
         img = Image.open(io.BytesIO(img_bytes))
         fig, ax = plt.subplots()
         ax.imshow(img)
-        fig.canvas.mpl_connect('close_event', on_close)
         # Show the Matplotlib figure without blocking
         plt.show(block=False)
 
