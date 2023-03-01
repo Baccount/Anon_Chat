@@ -1,5 +1,6 @@
 from bridges.downloadbridges import DownloadBridges
 
+
 def main():
     db = DownloadBridges()
     db.getCaptcha()
@@ -11,5 +12,7 @@ def main():
     db.cleanup()
     obsf4Bridges = db.readBridges()
     print(obsf4Bridges)
+
+
 if __name__ == "__main__":
     main()

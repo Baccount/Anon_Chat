@@ -1,12 +1,17 @@
-from .meek import Meek
-import requests
-from logging_msg import log_msg
-import os
-import io
-import matplotlib.pyplot as plt
-from PIL import Image
-import json
 import base64
+import io
+import json
+import os
+
+import matplotlib.pyplot as plt
+import requests
+from PIL import Image
+
+from logging_msg import log_msg
+
+from .meek import Meek
+
+
 class DownloadBridges:
     def __init__(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
@@ -15,11 +20,6 @@ class DownloadBridges:
         self.meek = Meek(self.meek_path)
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
-        
-
-
-
-
 
     def getCaptcha(self):
         try:
@@ -44,7 +44,6 @@ class DownloadBridges:
             self.challenge = moat_res["data"][0]["challenge"]
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
-
 
     def display_image(self):
         try:
@@ -79,7 +78,7 @@ class DownloadBridges:
                     ]
                 },
             )
-            log_msg("display_image","on_close", "Closing the window")
+            log_msg("display_image", "on_close", "Closing the window")
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
@@ -92,7 +91,7 @@ class DownloadBridges:
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
-        log_msg("DownloadBridges","checkCaptcha",  "Captcha is correct")
+        log_msg("DownloadBridges", "checkCaptcha", "Captcha is correct")
         log_msg("Bridges", data)
         return True
 
@@ -101,8 +100,8 @@ class DownloadBridges:
         Return the bridges
         """
         bridges = []
-        for item in self.bridge.json()['data']:
-            bridges.extend(item['bridges'])
+        for item in self.bridge.json()["data"]:
+            bridges.extend(item["bridges"])
         return bridges
 
     def cleanup(self):
@@ -117,7 +116,7 @@ class DownloadBridges:
         """
         log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
         bridge_lst = self.getBridges()
-        with open('bridges.json', 'w') as f:
+        with open("bridges.json", "w") as f:
             json.dump(bridge_lst, f)
 
     def readBridges(self):
@@ -125,6 +124,6 @@ class DownloadBridges:
         Read the bridges from a file
         """
         log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
-        with open('bridges.json', 'r') as f:
+        with open("bridges.json", "r") as f:
             my_list = json.load(f)
         return my_list

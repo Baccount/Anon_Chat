@@ -1,31 +1,33 @@
-from server.server import Server
 import os
 import subprocess
-from stem.process import launch_tor_with_config
-from logging_msg import log_msg
-from bridges.downloadbridges import DownloadBridges
 
+from stem.process import launch_tor_with_config
+
+from bridges.downloadbridges import DownloadBridges
+from logging_msg import log_msg
+from server.server import Server
 
 # path to the tor binary
-tor_dir = os.getcwd() + '/tor/tor'
-obsf4 = os.getcwd() + '/tor/obfs4proxy'
-geo_ip_file = os.getcwd() + '/tor/geoip'
-geo_ipv6_file = os.getcwd() + '/tor/geoip6'
+tor_dir = os.getcwd() + "/tor/tor"
+obsf4 = os.getcwd() + "/tor/obfs4proxy"
+geo_ip_file = os.getcwd() + "/tor/geoip"
+geo_ipv6_file = os.getcwd() + "/tor/geoip6"
 
 
-class StartServer():
+class StartServer:
     def __init__(self):
         self.tor_cfg = {
-        'SocksPort': '9050',
-        'ControlPort': '9051',
-        'CookieAuthentication': '1',
-        'AvoidDiskWrites': '1',
-        'Log': 'notice stdout',
-        'GeoIPFile': f'{geo_ip_file}',
-        'GeoIPv6File': f'{geo_ipv6_file}',
+            "SocksPort": "9050",
+            "ControlPort": "9051",
+            "CookieAuthentication": "1",
+            "AvoidDiskWrites": "1",
+            "Log": "notice stdout",
+            "GeoIPFile": f"{geo_ip_file}",
+            "GeoIPv6File": f"{geo_ipv6_file}",
         }
         # TODO Improve this
-        if input("Use bridges? (y/n) ") == "y" or "Y":
+        choice = input("Use bridges? (y/n) ")
+        if choice == "y" or choice == "Y":
             self.use_bridges()
         log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
         log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
@@ -71,9 +73,6 @@ class StartServer():
         except Exception as e:
             print(e)
 
-
-
-
     def use_bridges(self):
         # return the new configuration with bridges
         db = DownloadBridges()
@@ -86,24 +85,21 @@ class StartServer():
         db.cleanup()
         obsf4Bridges = db.readBridges()
 
-
-
         self.tor_cfg = {
-        'SocksPort': '9050',
-        'ControlPort': '9051',
-        'CookieAuthentication': '1',
-        'AvoidDiskWrites': '1',
-        'Log': 'notice stdout',
-        'GeoIPFile': f'{geo_ip_file}',
-        'GeoIPv6File': f'{geo_ipv6_file}',
-        # use bridges
-        'ClientTransportPlugin': f'obfs4 exec {obsf4}',
-        'UseBridges': '1',
-        'Bridge': obsf4Bridges,
+            "SocksPort": "9050",
+            "ControlPort": "9051",
+            "CookieAuthentication": "1",
+            "AvoidDiskWrites": "1",
+            "Log": "notice stdout",
+            "GeoIPFile": f"{geo_ip_file}",
+            "GeoIPv6File": f"{geo_ipv6_file}",
+            # use bridges
+            "ClientTransportPlugin": f"obfs4 exec {obsf4}",
+            "UseBridges": "1",
+            "Bridge": obsf4Bridges,
         }
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     server = StartServer()
     server.start()
