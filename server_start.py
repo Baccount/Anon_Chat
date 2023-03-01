@@ -24,8 +24,9 @@ class StartServer():
         'GeoIPFile': f'{geo_ip_file}',
         'GeoIPv6File': f'{geo_ipv6_file}',
         }
-        # TODO REMOVE THIS
-        self.use_bridges()
+        # TODO Improve this
+        if input("Use bridges? (y/n) ") == "y" or "Y":
+            self.use_bridges()
         log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
         log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
 

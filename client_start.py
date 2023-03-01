@@ -27,7 +27,8 @@ class ClientServer():
         'GeoIPv6File': f'{geo_ipv6_file}',
         }
         # TODO REMOVE THIS
-        self.use_bridges()
+        if input("Use bridges? (y/n) ") == "y" or "Y":
+            self.use_bridges()
 
 
     def start(self):
