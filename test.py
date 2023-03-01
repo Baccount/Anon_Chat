@@ -11,10 +11,7 @@ def main():
     db.saveBridges()
     db.cleanup()
     
-    print("bridges saved to bridges.json")
-    with open('bridges.json', 'r') as f:
-        my_list = json.load(f)
-    print(my_list[0])
+    print(db.readBridges())
 
 if __name__ == "__main__":
     main()

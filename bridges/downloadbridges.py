@@ -132,3 +132,12 @@ class DownloadBridges:
         bridge_lst = self.getBridges()
         with open('bridges.json', 'w') as f:
             json.dump(bridge_lst, f)
+
+    def readBridges(self):
+        """
+        Read the bridges from a file
+        """
+        log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
+        with open('bridges.json', 'r') as f:
+            my_list = json.load(f)
+        return my_list
