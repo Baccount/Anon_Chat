@@ -1,5 +1,5 @@
 # AnonChat - Secure Terminal Chatroom Over Tor Onion Service
-
+Hi Dr.Recor 😄
 AnonChat is a secure, anonymous, and terminal-based chatroom application that operates over the Tor network. With AnonChat, you can communicate with others in a private and encrypted manner, ensuring that your conversations remain untraceable and protected from prying eyes.
 
 ## Key Features
