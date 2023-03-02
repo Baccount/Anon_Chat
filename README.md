@@ -16,6 +16,14 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 1. Install the Tor on your computer.
 2. Clone this repository to your local machine using the following command:
 
-`git clone https://github.com/Baccount/Anon_Chat.git`
+        git clone https://github.com/Baccount/Anon_Chat.git
+        pip install -r requirements.txt
 
-`pip install -r requirements.txt`
+
+3. Run the AnonChat Server using the following command:
+
+        python server_start.py
+
+4. Run the AnonChat Client using the following command:
+
+        python client_start.py
