@@ -166,6 +166,10 @@ class Server(Cmd):
                 chunk = connection.recv(1024)
                 log_msg("__user_thread", f"chunk: {chunk}")
 
+                if chunk == b'':
+                    self.disconnectUsr(user_id, nickname)
+                    break
+
                 if chunk:
                     buffer += chunk
                 else:
