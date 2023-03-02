@@ -22,6 +22,7 @@ class Client(Cmd):
         self.__id = None
         self.__nickname = None
         self.__isLogin = False
+        self.onion_address = None
 
     def __receive_message_thread(self):
         """
@@ -93,6 +94,7 @@ class Client(Cmd):
         Connect to the server using the onion address.
         """
         onion = input("Enter your onion address: ")
+        self.onion_address = onion
         # start tor onion service
         self.tor.connect_onion(onion)
         self.cmdloop()
@@ -173,11 +175,21 @@ class Client(Cmd):
         log_msg("do_logout", "You have logged out")
         return True
 
-    def do_h():
+    def do_h(self, args=None):
         """
         Show help menu.
         """
         print('login <nickname> - login to the chat room')
         print('s - send message from server to all clients')
+        print('o - show onion address')
         print('logout - logout from the chat room')
         print('h - show help menu')
+
+    def g(self, text):
+        # return green text
+        return '\033[92m' + text + '\033[0m'
+
+    def do_o(self, args):
+        # print the onion address
+        onion = self.g(self.onion_address)
+        print(f"{onion}")
