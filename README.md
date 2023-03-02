@@ -27,3 +27,14 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 4. Run the AnonChat Client using the following command:
 
         python client_start.py
+
+
+## Commands
+### Server Commands
+- `h` - Displays a list of commands
+- `s` - "Send Message" - Sends a message to all connected clients
+- `o` - "Show Onion Address" - Displays the Onion Address of the server
+- `l` - "List" all users in the chat room and their IDs
+- `ban` - "Ban" - Bans a user from the chat room. using the following command:
+
+        ban <id>
