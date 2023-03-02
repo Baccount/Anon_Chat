@@ -84,6 +84,15 @@ class Server(Cmd):
         except Exception as e:
             log_msg("ban_user", f"Error: {e}")
 
+    def do_h(self, args):
+        """
+        Show help menu.
+        """
+        print('o - print onion address')
+        print('l - list all users and their ids')
+        print('s - send message from server to all clients')
+        print('ban <id> - ban a user from the chat room using their id')
+
 
 
     def disconnectUsr(self, user_id, nickname="NONE"):
@@ -165,6 +174,10 @@ class Server(Cmd):
                 buffer = b''
                 chunk = connection.recv(1024)
                 log_msg("__user_thread", f"chunk: {chunk}")
+
+                if chunk == b'':
+                    self.disconnectUsr(user_id, nickname)
+                    break
 
                 if chunk:
                     buffer += chunk

@@ -22,6 +22,7 @@ class Client(Cmd):
         self.__id = None
         self.__nickname = None
         self.__isLogin = False
+        self.onion_address = None
 
     def __receive_message_thread(self):
         """
@@ -93,6 +94,7 @@ class Client(Cmd):
         Connect to the server using the onion address.
         """
         onion = input("Enter your onion address: ")
+        self.onion_address = onion
         # start tor onion service
         self.tor.connect_onion(onion)
         self.cmdloop()
@@ -173,21 +175,21 @@ class Client(Cmd):
         log_msg("do_logout", "You have logged out")
         return True
 
-    def do_help(self, arg):
+    def do_h(self, args=None):
         """
-        Display help information for the given command.
-        :param arg: the command for which help information is needed
+        Show help menu.
         """
-        command = arg.split(' ')[0]
-        if command == '':
-            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
-            print('[Help] send message - Send a message, message is the message you entered')
-            print('[Help] logout - exit chat room')
-        elif command == 'login':
-            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
-        elif command == 'send':
-            print('[Help] send message - Send a message, message is the message you entered')
-        elif command == 'logout':
-            print('[Help] logout - exit chat room')
-        else:
-            print('[Help] The command you want to know is not found')
+        print('login <nickname> - login to the chat room')
+        print('s - send message from server to all clients')
+        print('o - show onion address')
+        print('logout - logout from the chat room')
+        print('h - show help menu')
+
+    def g(self, text):
+        # return green text
+        return '\033[92m' + text + '\033[0m'
+
+    def do_o(self, args):
+        # print the onion address
+        onion = self.g(self.onion_address)
+        print(f"{onion}")
