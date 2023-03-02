@@ -173,21 +173,12 @@ class Client(Cmd):
         log_msg("do_logout", "You have logged out")
         return True
 
-    def do_help(self, arg):
+    def do_h(self, arg):
         """
         Display help information for the given command.
-        :param arg: the command for which help information is needed
         """
-        command = arg.split(' ')[0]
-        if command == '':
-            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
-            print('[Help] send message - Send a message, message is the message you entered')
-            print('[Help] logout - exit chat room')
-        elif command == 'login':
-            print('[Help] login nickname - Login to the chat room, nickname is the nickname you choose')
-        elif command == 'send':
-            print('[Help] send message - Send a message, message is the message you entered')
-        elif command == 'logout':
-            print('[Help] logout - exit chat room')
-        else:
-            print('[Help] The command you want to know is not found')
+        print("$h Displays a list of commands")
+        print("$s Sends a message to all connected clients except self")
+        print("$login - 'Login' - Logs into the chat room using the following command:")
+        print("$login <username>")
+        print("$logout - 'Logout' - Logs out of the chat room")

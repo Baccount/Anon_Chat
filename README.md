@@ -38,3 +38,12 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 - `ban` - "Ban" - Bans a user from the chat room. using the following command:
 
         ban <id>
+
+
+### Client Commands
+- `h` - Displays a list of commands
+- `s` - "Send Message" - Sends a message to all connected clients except self
+- `login` - "Login" - Logs into the chat room using the following command:
+
+        login <username>
+- `logout` - "Logout" - Logs out of the chat room
