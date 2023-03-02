@@ -173,12 +173,11 @@ class Client(Cmd):
         log_msg("do_logout", "You have logged out")
         return True
 
-    def do_h(self, arg):
+    def do_h():
         """
-        Display help information for the given command.
+        Show help menu.
         """
-        print("$h Displays a list of commands")
-        print("$s Sends a message to all connected clients except self")
-        print("$login - 'Login' - Logs into the chat room using the following command:")
-        print("$login <username>")
-        print("$logout - 'Logout' - Logs out of the chat room")
+        print('login <nickname> - login to the chat room')
+        print('s - send message from server to all clients')
+        print('logout - logout from the chat room')
+        print('h - show help menu')
