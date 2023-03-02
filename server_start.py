@@ -34,7 +34,7 @@ class StartServer:
 
     def start(self):
         # start Tor with the new configuration if tor is not running
-        log_msg("Onion", "connect", f"starting tor bin {tor_dir}")
+        log_msg("StartServer", "start", f"starting tor bin {tor_dir}")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
