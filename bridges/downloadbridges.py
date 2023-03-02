@@ -86,8 +86,15 @@ class DownloadBridges:
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
+        return self.checkData()
 
-        # If data is present, then the captcha is correct
+
+    def checkData(self):
+        """ Check the data
+
+        Returns:
+            bool: True if it exists else False
+        """
         try:
             data = self.bridge.json()["data"]
             if not data:
