@@ -61,9 +61,8 @@ class ClientServer:
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
         if not os.path.exists("bridges.json"):
-            db = DownloadBridges()
-            db.getCaptcha()
-            db.display_image()
+            db = DownloadBridges(protocol="obfs4")
+            db.getBridges()
             if not db.checkCaptcha():
                 print("Captcha is incorrect")
                 self.use_bridges()
@@ -71,6 +70,7 @@ class ClientServer:
             db.cleanup()
             obsf4Bridges = db.readBridges()
         else:
+            log_msg("StartServer","use_bridges", "bridges.json exists, using bridges from file")
             db = DownloadBridges()
             obsf4Bridges = db.readBridges()
         self.tor_cfg = {

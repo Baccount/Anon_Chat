@@ -10,8 +10,11 @@ from .meek import Meek
 
 
 class DownloadBridges:
-    def __init__(self, protocol):
+    def __init__(self, protocol=None):
         self.protocol = protocol
+
+
+    def getBridges(self):
         self.connectMeek()
         self.getCaptcha()
         self.display_image()
