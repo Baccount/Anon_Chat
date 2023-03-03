@@ -14,7 +14,7 @@ class DownloadBridges:
         self.protocol = protocol
 
 
-    def getBridges(self):
+    def startBridges(self):
         self.connectMeek()
         self.getCaptcha()
         self.display_image()
