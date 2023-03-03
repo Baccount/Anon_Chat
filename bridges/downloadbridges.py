@@ -8,9 +8,16 @@ from logging_msg import log_msg
 from .meek import Meek
 
 
+
 class DownloadBridges:
-    def __init__(self):
-        pass
+    def __init__(self, protocol=None):
+        self.protocol = protocol
+
+
+    def startBridges(self):
+        self.connectMeek()
+        self.getCaptcha()
+        self.display_image()
 
     def connectMeek(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
@@ -21,7 +28,6 @@ class DownloadBridges:
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
 
     def getCaptcha(self):
-        self.connectMeek()
         try:
             log_msg("DownloadBridges", "getBridge", "Getting bridge")
             captcha = requests.post(
@@ -33,7 +39,7 @@ class DownloadBridges:
                         {
                             "version": "0.1.0",
                             "type": "client-transports",
-                            "supported": ["obfs4", "snowflake"],
+                            "supported": [self.protocol],
                         }
                     ]
                 },
@@ -42,6 +48,7 @@ class DownloadBridges:
             self.transport = moat_res["data"][0]["transport"]
             self.image = moat_res["data"][0]["image"]
             self.challenge = moat_res["data"][0]["challenge"]
+            log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
 
@@ -60,6 +67,7 @@ class DownloadBridges:
         """
         try:
             log_msg("DownloadBridges", "checkCaptcha", "Checking Captcha")
+            solution = input("Enter the solution: ")
             self.bridge = requests.post(
                 "https://bridges.torproject.org/moat/check",
                 headers={"Content-Type": "application/vnd.api+json"},
@@ -72,25 +80,36 @@ class DownloadBridges:
                             "version": "0.1.0",
                             "transport": self.transport,
                             "challenge": self.challenge,
-                            "solution": input("Enter the solution: "),
+                            "solution": solution,
                             "qrcode": "false",
                         }
                     ]
                 },
             )
-            log_msg("display_image", "on_close", "Closing the window")
-        except Exception as e:
-            log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
-            return False
-        # If data is present, then the captcha is correct
-        try:
-            data = self.bridge.json()["data"]
-            if not data:
-                log_msg("DownloadBridges", "checkCaptcha", "Error: ")
+            if self.bridge.status_code != 200:
+                log_msg(self.red("DownloadBridges"), self.red("checkCaptcha", "Server Error: " + str(self.bridge.status_code)))
                 return False
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
+        return self.checkData()
+
+
+    def checkData(self):
+        """ Check the data
+
+        Returns:
+            bool: True if it exists else False
+        """
+        try:
+            data = self.bridge.json()["data"]
+            if not data:
+                log_msg("DownloadBridges", "checkCaptcha", "Captcha is incorrect")
+                return False
+        except Exception as e:
+            log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
+            return False
+        # Success
         log_msg("DownloadBridges", "checkCaptcha", "Captcha is correct")
         log_msg("Bridges", data)
         return True
@@ -127,3 +146,7 @@ class DownloadBridges:
         with open("bridges.json", "r") as f:
             my_list = json.load(f)
         return my_list
+
+# accecp any number of arguments
+    def red(self, *args):
+        return f"\033[91m {args}\033[00m"

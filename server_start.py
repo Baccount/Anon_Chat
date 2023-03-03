@@ -34,7 +34,7 @@ class StartServer:
 
     def start(self):
         # start Tor with the new configuration if tor is not running
-        log_msg("Onion", "connect", f"starting tor bin {tor_dir}")
+        log_msg("StartServer", "start", f"starting tor bin {tor_dir}")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
@@ -78,9 +78,8 @@ class StartServer:
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
         if not os.path.exists("bridges.json"):
-            db = DownloadBridges()
-            db.getCaptcha()
-            db.display_image()
+            db = DownloadBridges(protocol="obfs4")
+            db.startBridges()
             if not db.checkCaptcha():
                 print("Captcha is incorrect")
                 self.use_bridges()
@@ -88,6 +87,7 @@ class StartServer:
             db.cleanup()
             obsf4Bridges = db.readBridges()
         else:
+            log_msg("StartServer","use_bridges", "bridges.json exists, using bridges from file")
             db = DownloadBridges()
             obsf4Bridges = db.readBridges()
         self.tor_cfg = {

@@ -24,77 +24,6 @@ class Server(Cmd):
         self.__lock = threading.Lock()
         self.onion_address = None
 
-    def do_o(self, args):
-        # print the onion address
-        onion = self.g(self.onion_address) + self.g(".onion")
-        print(f"{onion}")
-
-    def do_ban(self, args):
-        """
-        Ban a user from the chat room.
-
-        :param args: The id of the user to be banned.
-        """
-        try:
-            if int(args) == 0:
-                print('Cannot ban server because it is the server!')
-                log_msg("do_ban", f"Cannot ban server because it is the server! {args} is the server")
-                return
-            self.ban_user(user_id=int(args))
-        except Exception as e:
-            print('server line 38')
-            print(e)
-
-    def do_l(self, args):
-        """
-        List all users in the chat room.
-
-        """
-        try:
-            for i in range(len(self.__connections)):
-                print(f'{i} : {self.__nicknames[i]}')
-        except Exception as e:
-            log_msg("do_l", f"Error: {e}")
-
-
-    def do_s(self, args):
-        """
-        Send a message to the chat room from the Server.
-
-        :param args: The message to be sent.
-        """
-        args = '\033[92m' + args + '\033[0m'
-        self.__broadcast(user_id=0 ,message=args)
-
-
-    def ban_user(self, user_id):
-        """
-        Ban a user from the chat room.
-
-        Args:
-        - user_id (int): The ID of the user to be banned.
-        """
-        try:
-            nickname = self.__nicknames[user_id]
-            self.__broadcast(message=f"User {nickname}({user_id}) has been banned from the chat room")
-            self.__connections[user_id].close()
-            # remove the user from the list
-            self.__connections[user_id] = None
-            self.__nicknames[user_id] = None
-        except Exception as e:
-            log_msg("ban_user", f"Error: {e}")
-
-    def do_h(self, args):
-        """
-        Show help menu.
-        """
-        print('o - print onion address')
-        print('l - list all users and their ids')
-        print('s - send message from server to all clients')
-        print('ban <id> - ban a user from the chat room using their id')
-
-
-
     def disconnectUsr(self, user_id, nickname="NONE"):
         """
         Disconnect a user from the chat room.
@@ -304,3 +233,72 @@ class Server(Cmd):
             thread = threading.Thread(target=self.__waitForLogin, args=(connection,))
             thread.setDaemon(True)
             thread.start()
+
+    def do_o(self, args):
+        # print the onion address
+        onion = self.g(self.onion_address) + self.g(".onion")
+        print(f"{onion}")
+
+    def do_ban(self, args):
+        """
+        Ban a user from the chat room.
+
+        :param args: The id of the user to be banned.
+        """
+        try:
+            if int(args) == 0:
+                print('Cannot ban server because it is the server!')
+                log_msg("do_ban", f"Cannot ban server because it is the server! {args} is the server")
+                return
+            self.ban_user(user_id=int(args))
+        except Exception as e:
+            print('server line 38')
+            print(e)
+
+    def do_l(self, args):
+        """
+        List all users in the chat room.
+
+        """
+        try:
+            for i in range(len(self.__connections)):
+                print(f'{i} : {self.__nicknames[i]}')
+        except Exception as e:
+            log_msg("do_l", f"Error: {e}")
+
+
+    def do_s(self, args):
+        """
+        Send a message to the chat room from the Server.
+
+        :param args: The message to be sent.
+        """
+        args = '\033[92m' + args + '\033[0m'
+        self.__broadcast(user_id=0 ,message=args)
+
+
+    def ban_user(self, user_id):
+        """
+        Ban a user from the chat room.
+
+        Args:
+        - user_id (int): The ID of the user to be banned.
+        """
+        try:
+            nickname = self.__nicknames[user_id]
+            self.__broadcast(message=f"User {nickname}({user_id}) has been banned from the chat room")
+            self.__connections[user_id].close()
+            # remove the user from the list
+            self.__connections[user_id] = None
+            self.__nicknames[user_id] = None
+        except Exception as e:
+            log_msg("ban_user", f"Error: {e}")
+
+    def do_h(self, args):
+        """
+        Show help menu.
+        """
+        print('o - print onion address')
+        print('l - list all users and their ids')
+        print('s - send message from server to all clients')
+        print('ban <id> - ban a user from the chat room using their id')

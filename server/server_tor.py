@@ -3,6 +3,7 @@ from random import randint
 from stem.control import Controller
 from logging_msg import log_msg
 import subprocess
+from stem import ProtocolError
 
 import os
 
@@ -57,8 +58,15 @@ class CreateOnion():
         '''
         create ephemeral hidden services
         '''
-        log_msg("ephemeral_onion", "Creating ephemeral hidden service on port 80")
-        return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+        try:
+            log_msg("ephemeral_onion", "Creating ephemeral hidden service on port 80")
+            return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+        except ProtocolError as e:
+            # kill tor subprocess
+            log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
+            self.force_kill_tor()
+            # call the function again
+            self.ephemeral_onion()
 
 
     def non_ephemeral_onion(self):
@@ -66,17 +74,23 @@ class CreateOnion():
         create non-ephemeral hidden services using a private key
         '''
         # set key path as the current directory
-        key_path = os.path.join(os.path.dirname(__file__), 'private_key')
-        log_msg("non_ephemeral_onion", "Creating non-ephemeral hidden service on port 80")
-        if not os.path.exists(key_path):
-            response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
-            with open(key_path, 'w') as key_file:
-                key_file.write('%s:%s' % (response.private_key_type, response.private_key))
-            return response
-        else:
-            with open(key_path) as key_file:
-                key_type, key_content = key_file.read().split(':', 1)
-                log_msg("non_ephemeral_onion", f"Using existing private key {key_content}")
-            response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type=key_type, key_content=key_content, await_publication = True)
-
+        try:
+            key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+            log_msg("non_ephemeral_onion", "Creating non-ephemeral hidden service on port 80")
+            if not os.path.exists(key_path):
+                response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
+                with open(key_path, 'w') as key_file:
+                    key_file.write('%s:%s' % (response.private_key_type, response.private_key))
+                return response
+            else:
+                with open(key_path) as key_file:
+                    key_type, key_content = key_file.read().split(':', 1)
+                    log_msg("non_ephemeral_onion", f"Using existing private key {key_content}")
+                response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type=key_type, key_content=key_content, await_publication = True)
+        except ProtocolError as e:
+            # kill tor subprocess
+            log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
+            self.force_kill_tor()
+            # call the function again
+            self.non_ephemeral_onion()
         return response
