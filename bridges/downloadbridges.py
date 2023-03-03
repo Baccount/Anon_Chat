@@ -10,8 +10,11 @@ from .meek import Meek
 
 
 class DownloadBridges:
-    def __init__(self):
+    def __init__(self, protocol):
+        self.protocol = protocol
         self.connectMeek()
+        self.getCaptcha()
+        self.display_image()
 
     def connectMeek(self):
         self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
@@ -33,7 +36,7 @@ class DownloadBridges:
                         {
                             "version": "0.1.0",
                             "type": "client-transports",
-                            "supported": ["obfs4"],
+                            "supported": [self.protocol],
                         }
                     ]
                 },

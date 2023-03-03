@@ -78,9 +78,7 @@ class StartServer:
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
         if not os.path.exists("bridges.json"):
-            db = DownloadBridges()
-            db.getCaptcha()
-            db.display_image()
+            db = DownloadBridges(protocol="obfs4")
             if not db.checkCaptcha():
                 print("Captcha is incorrect")
                 self.use_bridges()
