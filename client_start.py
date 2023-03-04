@@ -81,7 +81,6 @@ class ClientServer:
             "Log": "notice stdout",
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
-            # use bridges
             "ClientTransportPlugin": f"obfs4 exec {obsf4}",
             "UseBridges": "1",
             "Bridge": obsf4Bridges,
