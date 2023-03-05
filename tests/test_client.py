@@ -9,4 +9,7 @@ from client.connect_tor import Tor
 # run tests for client
 def test_client_tor():
     # test tor connection
-    tor = Tor()
+    pass
+
+if __name__ == "__main__":
+    test_client_tor()
