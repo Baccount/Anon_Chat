@@ -13,6 +13,8 @@ def test_connect_onion():
     client = ClientServer()
     client.start(test=True)
 
-    t = Tor()
+    tor = Tor()
     # # # test tor connection to duckduckgo
-    t.connect_onion("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion")
+    tor.connect_onion("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion")
+    # kill tor
+    tor.force_kill_tor()
