@@ -1,15 +1,18 @@
 import sys
 sys.path.append('../')
-
 # trunk-ignore(flake8/E402)
 from client.connect_tor import Tor
+# trunk-ignore(flake8/E402)
+from client_start import ClientServer
 
 
 
 # run tests for client
-def test_client_tor():
-    # test tor connection
-    pass
+def test_connect_onion():
+    # start tor
+    client = ClientServer()
+    client.start(test=True)
 
-if __name__ == "__main__":
-    test_client_tor()
+    t = Tor()
+    # # # test tor connection to duckduckgo
+    t.connect_onion("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion")
