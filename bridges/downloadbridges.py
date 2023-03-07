@@ -67,6 +67,9 @@ class DownloadBridges:
             image.show()
         except Exception as e:
             log_msg("DownloadBridges", "display_image", f"Error: {e}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def checkCaptcha(self):
         """
@@ -123,7 +126,7 @@ class DownloadBridges:
 
     def getBridges(self):
         """
-        Return the bridges
+        Return the bridges from the json
         """
         bridges = []
         for item in self.bridge.json()["data"]:
@@ -135,6 +138,9 @@ class DownloadBridges:
         Cleanup the meek process
         """
         self.meek.cleanup()
+        if self.test is True:
+            # we are testing
+            return True
 
     def saveBridges(self):
         """
