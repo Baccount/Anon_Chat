@@ -12,9 +12,9 @@ class TestServer():
         self.server = StartServer(test=True)
 
 
-
     def test_server_tor(self):
         assert  self.server.start() is True
+
 
 
     def test_server_kill(self):
