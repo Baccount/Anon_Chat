@@ -26,11 +26,11 @@ class ClientServer:
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
 
-        choice = input("Use bridges? (y/n) ")
-        if choice == "y" or choice == "Y":
-            self.use_bridges()
+        # choice = input("Use bridges? (y/n) ")
+        # if choice == "y" or choice == "Y":
+        #     self.use_bridges()
 
-    def start(self):
+    def start(self, test=False):
         # start Tor with the new configuration if tor is not running
         log_msg("Client_Start", "start", f"starting {tor_dir}")
         try:
@@ -43,8 +43,10 @@ class ClientServer:
             # tor is already running
             log_msg("ClientServer", "start", f"Error: {e}")
         try:
-            client = Client()
-            client.start()
+            if not test:
+                # start the client if not testing
+                client = Client()
+                client.start()
         except KeyboardInterrupt:
             log_msg("Client_Start", "start", "keyboard interrupt")
             print("\nExiting...")
@@ -81,7 +83,6 @@ class ClientServer:
             "Log": "notice stdout",
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
-            # use bridges
             "ClientTransportPlugin": f"obfs4 exec {obsf4}",
             "UseBridges": "1",
             "Bridge": obsf4Bridges,

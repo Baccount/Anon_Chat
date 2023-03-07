@@ -6,7 +6,8 @@ from logging_msg import log_msg
 
 class Tor(object):
 
-    def __init__(self):
+    def __init__(self, test=False):
+        self.test = test
         try:
             socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
             socket.socket = socks.socksocket
@@ -43,3 +44,6 @@ class Tor(object):
         log_msg("connect_tor", "connect_onion", f"connecting to {onion}")
         self.server = (onion, 80)
         self.socket.connect(self.server)
+        if self.test:
+            # were testing
+            return True

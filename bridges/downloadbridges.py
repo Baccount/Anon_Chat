@@ -10,8 +10,9 @@ from .meek import Meek
 
 
 class DownloadBridges:
-    def __init__(self, protocol=None):
+    def __init__(self, protocol=None, test=False):
         self.protocol = protocol
+        self.test = test
 
 
     def startBridges(self):
@@ -26,6 +27,9 @@ class DownloadBridges:
         self.meek = Meek(self.meek_path)
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def getCaptcha(self):
         try:
@@ -51,6 +55,9 @@ class DownloadBridges:
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def display_image(self):
         try:
@@ -60,6 +67,9 @@ class DownloadBridges:
             image.show()
         except Exception as e:
             log_msg("DownloadBridges", "display_image", f"Error: {e}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def checkCaptcha(self):
         """
@@ -116,7 +126,7 @@ class DownloadBridges:
 
     def getBridges(self):
         """
-        Return the bridges
+        Return the bridges from the json
         """
         bridges = []
         for item in self.bridge.json()["data"]:
@@ -128,6 +138,9 @@ class DownloadBridges:
         Cleanup the meek process
         """
         self.meek.cleanup()
+        if self.test is True:
+            # we are testing
+            return True
 
     def saveBridges(self):
         """

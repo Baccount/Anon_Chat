@@ -15,7 +15,8 @@ geo_ipv6_file = os.getcwd() + "/tor/geoip6"
 
 
 class StartServer:
-    def __init__(self):
+    def __init__(self, test=False):
+        self.test = test
         self.tor_cfg = {
             "SocksPort": "9050",
             "ControlPort": "9051",
@@ -25,12 +26,13 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-
-        choice = input("Use bridges? (y/n) ")
-        if choice == "y" or choice == "Y":
-            self.use_bridges()
-        log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
-        log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+        if not self.test:
+            # we are not testing
+            choice = input("Use bridges? (y/n) ")
+            if choice == "y" or choice == "Y":
+                self.use_bridges()
+            log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
+            log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
 
     def start(self):
         # start Tor with the new configuration if tor is not running
@@ -42,14 +44,19 @@ class StartServer:
             )
         except Exception as e:
             print(e)
-        try:
-            server = Server()
-            server.start()
-        except KeyboardInterrupt:
-            print("\nExiting...")
-            self.force_kill_tor()
-            log_msg("Tor", "killed tor subprocess")
-            exit(1)
+        # start the server if we are Not testing
+        if self.test is False:
+            try:
+                server = Server()
+                server.start()
+            except KeyboardInterrupt:
+                print("\nExiting...")
+                self.force_kill_tor()
+                log_msg("Tor", "killed tor subprocess")
+                exit(1)
+        if self.test:
+            # we are testing
+            return True
 
     def force_kill_tor(self):
         """
@@ -72,6 +79,9 @@ class StartServer:
                 print("No process named tor found.")
         except Exception as e:
             print(e)
+        if self.test:
+            # we are testing
+            return True
 
 
 
