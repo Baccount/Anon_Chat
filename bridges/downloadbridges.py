@@ -10,8 +10,9 @@ from .meek import Meek
 
 
 class DownloadBridges:
-    def __init__(self, protocol=None):
+    def __init__(self, protocol=None, test=False):
         self.protocol = protocol
+        self.test = test
 
 
     def startBridges(self):
@@ -26,6 +27,9 @@ class DownloadBridges:
         self.meek = Meek(self.meek_path)
         self.meek_proxies = self.meek.start()
         log_msg("DownloadBridges", "__init__", f"Meek Proxie: {self.meek_proxies}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def getCaptcha(self):
         try:
@@ -51,6 +55,9 @@ class DownloadBridges:
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
+        if self.test is True:
+            # we are testing
+            return True
 
     def display_image(self):
         try:
