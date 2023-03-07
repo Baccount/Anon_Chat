@@ -2,16 +2,20 @@ import sys
 sys.path.append('../')
 
 # trunk-ignore(flake8/E402)
-from server.server_tor import CreateOnion
-# trunk-ignore(flake8/E402)
 from server_start import StartServer
 
 
 
+class TestServer():
 # run tests for client
-def test_server_tor():
-    # test tor connection
-    pass
+    def setup(self):
+        self.server = StartServer(test=True)
 
-if __name__ == "__main__":
-    test_server_tor()
+
+
+    def test_server_tor(self):
+        assert  self.server.start() is True
+
+
+    def test_server_kill(self):
+        assert self.server.force_kill_tor() is True
