@@ -1,5 +1,4 @@
 import socket
-from random import randint
 from stem.control import Controller
 from logging_msg import log_msg
 import subprocess
@@ -20,7 +19,8 @@ class CreateOnion():
     def __init__(self):
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.port = randint(10000, 65535)
+            # get available port
+            self.port = self.get_available_port()
             self.controller = Controller.from_port(port=9051)
             self.controller.authenticate()
             self.socket.bind(("127.0.0.1", self.port))
@@ -29,6 +29,13 @@ class CreateOnion():
             log_msg("CreateOnion", "__init__", f"Error: {e}")
             self.force_kill_tor()
             exit(1)
+
+    def get_available_port(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('localhost', 0))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            log_msg("CreateOnion", "get_available_port", f" Port: {s.getsockname()[1]}")
+            return s.getsockname()[1]
 
     def force_kill_tor(self):
         """

@@ -131,9 +131,13 @@ class DownloadBridges:
         Return the bridges from the json
         """
         bridges = []
-        for item in self.bridge.json()["data"]:
-            bridges.extend(item["bridges"])
-        return bridges
+        try:
+            for item in self.bridge.json()["data"]:
+                bridges.extend(item["bridges"])
+            return bridges
+        except Exception as e:
+            log_msg("DownloadBridges", "getBridges", "Error: " + str(e))
+            return bridges
 
     def cleanup(self):
         """
