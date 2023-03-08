@@ -105,14 +105,16 @@ class DownloadBridges:
         return self.checkData()
 
 
-    def checkData(self):
+    def checkData(self, data=None):
         """ Check the data
 
         Returns:
             bool: True if it exists else False
         """
         try:
-            data = self.bridge.json()["data"]
+            if data is None:
+                # we are not testing
+                data = self.bridge.json()["data"]
             if not data:
                 log_msg("DownloadBridges", "checkCaptcha", "Captcha is incorrect")
                 return False
@@ -129,9 +131,13 @@ class DownloadBridges:
         Return the bridges from the json
         """
         bridges = []
-        for item in self.bridge.json()["data"]:
-            bridges.extend(item["bridges"])
-        return bridges
+        try:
+            for item in self.bridge.json()["data"]:
+                bridges.extend(item["bridges"])
+            return bridges
+        except Exception as e:
+            log_msg("DownloadBridges", "getBridges", "Error: " + str(e))
+            return bridges
 
     def cleanup(self):
         """

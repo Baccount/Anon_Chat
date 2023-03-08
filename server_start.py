@@ -16,6 +16,7 @@ geo_ipv6_file = os.getcwd() + "/tor/geoip6"
 
 class StartServer:
     def __init__(self, test=False):
+        self.show_ascii()
         self.test = test
         self.tor_cfg = {
             "SocksPort": "9050",
@@ -26,7 +27,7 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if not self.test:
+        if self.test is False:
             # we are not testing
             choice = input("Use bridges? (y/n) ")
             if choice == "y" or choice == "Y":
@@ -37,6 +38,7 @@ class StartServer:
     def start(self):
         # start Tor with the new configuration if tor is not running
         log_msg("StartServer", "start", f"starting tor bin {tor_dir}")
+        log_msg("StartServer", "config tor", f"{self.tor_cfg}")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
@@ -45,6 +47,7 @@ class StartServer:
         except Exception as e:
             print(e)
         # start the server if we are Not testing
+        log_msg("StartServer", f"Are we testing: {self.test}")
         if self.test is False:
             try:
                 server = Server()
@@ -113,6 +116,16 @@ class StartServer:
             "UseBridges": "1",
             "Bridge": obsf4Bridges,
         }
+    def show_ascii(self):
+        print(
+            """
+             █████╗ ███╗   ██╗ ██████╗ ███╗   ██╗ ██████╗██╗  ██╗ █████╗ ████████╗    ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗ 
+            ██╔══██╗████╗  ██║██╔═══██╗████╗  ██║██╔════╝██║  ██║██╔══██╗╚══██╔══╝    ██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗
+            ███████║██╔██╗ ██║██║   ██║██╔██╗ ██║██║     ███████║███████║   ██║       ███████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝
+            ██╔══██║██║╚██╗██║██║   ██║██║╚██╗██║██║     ██╔══██║██╔══██║   ██║       ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗
+            ██║  ██║██║ ╚████║╚██████╔╝██║ ╚████║╚██████╗██║  ██║██║  ██║   ██║       ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║
+            ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
+            """)
 
 
 if __name__ == "__main__":
