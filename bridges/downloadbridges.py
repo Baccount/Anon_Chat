@@ -138,7 +138,7 @@ class DownloadBridges:
             return bridges
         except Exception as e:
             log_msg("DownloadBridges", "getBridges", "Error: " + str(e))
-            return bridges
+            raise Exception("No bridges found")
 
     def cleanup(self):
         """

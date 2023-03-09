@@ -1,7 +1,7 @@
 import threading
 import json
 from cmd import Cmd
-from .connect_tor import Tor
+from .connect_tor import ConnectTor
 from logging_msg import log_msg
 
 
@@ -18,7 +18,7 @@ class Client(Cmd):
         """
         super().__init__()
         # create a new tor instance
-        self.tor = Tor()
+        self.tor = ConnectTor()
         self.__id = None
         self.__nickname = None
         self.__isLogin = False
