@@ -52,6 +52,7 @@ class DownloadBridges:
             self.transport = moat_res["data"][0]["transport"]
             self.image = moat_res["data"][0]["image"]
             self.challenge = moat_res["data"][0]["challenge"]
+            log_msg("DownloadBridges", "getCaptcha", f"Moat Challenge: {self.challenge}")
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")

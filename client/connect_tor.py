@@ -1,4 +1,3 @@
-# this is the where all the tor connect code goes
 import socks
 import socket
 import subprocess

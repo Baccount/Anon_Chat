@@ -47,7 +47,7 @@ class StartServer:
         except Exception as e:
             print(e)
         # start the server if we are Not testing
-        log_msg("StartServer", f"Are we testing: {self.test}")
+        log_msg("StartServer ", f"Are we testing: {self.test}")
         if self.test is False:
             try:
                 server = Server()
