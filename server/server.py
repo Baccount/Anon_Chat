@@ -72,12 +72,8 @@ class Server(Cmd):
             log_msg("separateJson", f"objects: {objects}")
             return objects
 
-
-
-
     def decode_buffer(self, buffer):
         return buffer.decode()
-
 
     def handle_obj(self, obj, user_id, nickname):
         if obj['type'] == 'broadcast':
