@@ -3,7 +3,7 @@ import socket
 import subprocess
 from logging_msg import log_msg
 
-class Tor(object):
+class ConnectTor(object):
 
     def __init__(self, test=False):
         self.test = test

@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../')
 # trunk-ignore(flake8/E402)
-from client.connect_tor import Tor
+from client.connect_tor import ConnectTor
 # trunk-ignore(flake8/E402)
 from client_start import ClientServer
 # trunk-ignore(flake8/E402)
@@ -12,7 +12,7 @@ class TestClient:
         # start tor
         clientserver = ClientServer()
         clientserver.start(test=True)
-        self.tor = Tor(test=True)
+        self.tor = ConnectTor(test=True)
         self.client = Client()
 
 
