@@ -12,8 +12,8 @@ from client.client import Client
 class TestClient:
     def setup(self):
         # start tor
-        clientserver = ClientServer()
-        clientserver.start(test=True)
+        clientserver = ClientServer(test=True)
+        clientserver.start()
         self.client = Client()
 
 

@@ -15,7 +15,8 @@ geo_ipv6_file = os.getcwd() + "/tor/geoip6"
 
 
 class ClientServer:
-    def __init__(self):
+    def __init__(self, test=False):
+        self.test = test
         self.show_ascii()
         self.tor_cfg = {
             "SocksPort": "9050",
@@ -26,12 +27,12 @@ class ClientServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
+        if self.test is False:
+            choice = input("Use bridges? (y/n) ")
+            if choice == "y" or choice == "Y":
+                self.use_bridges()
 
-        choice = input("Use bridges? (y/n) ")
-        if choice == "y" or choice == "Y":
-            self.use_bridges()
-
-    def start(self, test=False):
+    def start(self):
         # start Tor with the new configuration if tor is not running
         log_msg("Client_Start", "start", f"starting {tor_dir}")
         try:
@@ -47,7 +48,7 @@ class ClientServer:
         # Add some space
         print("\n" * 2)
         try:
-            if not test:
+            if not self.test:
                 # start the client if not testing
                 client = Client()
                 client.start()
