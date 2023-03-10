@@ -6,7 +6,7 @@ from bridges.downloadbridges import DownloadBridges
 from client.client import Client
 from logging_msg import log_msg
 
-verbose = True
+
 # path to the tor binary
 tor_dir = os.getcwd() + "/tor/tor"
 obsf4 = os.getcwd() + "/tor/obfs4proxy"
