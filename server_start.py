@@ -32,6 +32,7 @@ class StartServer:
             choice = input("Use bridges? (y/n) ")
             if choice == "y" or choice == "Y":
                 self.use_bridges()
+            # TODO improve logic
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
 

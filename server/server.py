@@ -209,7 +209,10 @@ class Server(Cmd):
             response = self.tor.non_ephemeral_onion()
         elif choice == "3":
             self.delete_private_key()
-            exit()
+            self.start()
+        else:
+            print("Invalid choice")
+            self.start()
 
 
         print('[Server] server is running......')
