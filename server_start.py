@@ -48,7 +48,7 @@ class StartServer:
                 init_msg_handler = self.print_bootstrap_lines,
             )
         except Exception as e:
-            print(e)        
+            print(e)
         # Add some space
         print("\n" * 2)
         # start the server if we are Not testing
