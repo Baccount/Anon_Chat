@@ -27,9 +27,9 @@ class ClientServer:
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
 
-        # choice = input("Use bridges? (y/n) ")
-        # if choice == "y" or choice == "Y":
-        #     self.use_bridges()
+        choice = input("Use bridges? (y/n) ")
+        if choice == "y" or choice == "Y":
+            self.use_bridges()
 
     def start(self, test=False):
         # start Tor with the new configuration if tor is not running
@@ -38,11 +38,14 @@ class ClientServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout=60,
+                timeout = 120, # timeout in seconds
+                init_msg_handler = self.print_bootstrap_lines,
             )
         except Exception as e:
             # tor is already running
             log_msg("ClientServer", "start", f"Error: {e}")
+        # Add some space
+        print("\n" * 2)
         try:
             if not test:
                 # start the client if not testing
@@ -53,6 +56,11 @@ class ClientServer:
             print("\nExiting...")
             self.kill_tor()
             exit(1)
+
+    def print_bootstrap_lines(self, line):
+        if "Bootstrapped " in line:
+            # print the line and clear it
+            print(line, end="\r")
 
     def kill_tor(self):
         try:
