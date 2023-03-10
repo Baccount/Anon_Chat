@@ -44,10 +44,13 @@ class StartServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout = 120 # timeout in seconds
+                timeout = 120, # timeout in seconds
+                init_msg_handler = self.print_bootstrap_lines,
             )
         except Exception as e:
             print(e)
+        # Add some space
+        print("\n" * 2)
         # start the server if we are Not testing
         log_msg("StartServer ", f"Are we testing: {self.test}")
         if self.test is False:
@@ -62,6 +65,11 @@ class StartServer:
         if self.test:
             # we are testing
             return True
+
+    def print_bootstrap_lines(self, line):
+        if "Bootstrapped " in line:
+            # print the line and clear it
+            print(line, end="\r")
 
     def force_kill_tor(self):
         """

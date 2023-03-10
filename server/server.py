@@ -178,10 +178,13 @@ class Server(Cmd):
                     break
 
         except Exception as e:
-            log_msg("__waitForLogin", f"Error: {e}")
-            log_msg("__waitForLogin", f"Disconnected user {len(self.__connections) - 1} ({obj['nickname']})")
-            connection.close()
-
+            # this occures when a user disconnects before logging in
+            try:
+                log_msg("__waitForLogin", f"Error: {e}")
+                log_msg("__waitForLogin", f"Disconnected user {len(self.__connections) - 1} ({obj['nickname']})")
+                connection.close()
+            except Exception as e:
+                log_msg("__waitForLogin", f"Error: {e}")
 
 
 
