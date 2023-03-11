@@ -49,16 +49,10 @@ class ClientServer:
             log_msg("ClientServer", "start", f"Error: {e}")
         # Add some space
         print("\n" * 2)
-        try:
-            if not self.test:
-                # start the client if not testing
-                client = Client()
-                client.start()
-        except KeyboardInterrupt:
-            log_msg("Client_Start", "start", "keyboard interrupt")
-            print("\nExiting...")
-            self.kill_tor()
-            exit(1)
+        if not self.test:
+            # start the client if not testing
+            client = Client()
+            client.start()
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
