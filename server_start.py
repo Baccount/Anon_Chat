@@ -6,6 +6,7 @@ from stem.process import launch_tor_with_config
 from bridges.downloadbridges import DownloadBridges
 from logging_msg import log_msg
 from server.server import Server
+from colorama import Fore, Style
 
 # path to the tor binary
 tor_dir = os.getcwd() + "/tor/tor"
@@ -69,7 +70,9 @@ class StartServer:
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
             # print the line and clear it
-            print(line, end="\r")
+            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
+
+            print(final_msg, end="\r")
 
     def force_kill_tor(self):
         """
