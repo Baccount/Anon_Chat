@@ -60,13 +60,6 @@ class ClientServer:
             final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
             print(final_msg, end="\r")
 
-    def kill_tor(self):
-        try:
-            self.tor_bin.kill()
-            log_msg("Client_Start", "kill_tor", "killed tor subprocess")
-        except Exception as e:
-            print(e)
-
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
         if not os.path.exists("bridges.json"):
