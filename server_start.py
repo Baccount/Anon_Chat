@@ -2,10 +2,11 @@ import os
 import subprocess
 
 from stem.process import launch_tor_with_config
-
+from kill_tor import force_kill_tor
 from bridges.downloadbridges import DownloadBridges
 from logging_msg import log_msg
 from server.server import Server
+from colorama import Fore, Style
 
 # path to the tor binary
 tor_dir = os.getcwd() + "/tor/tor"
@@ -54,14 +55,8 @@ class StartServer:
         # start the server if we are Not testing
         log_msg("StartServer ", f"Are we testing: {self.test}")
         if self.test is False:
-            try:
-                server = Server()
-                server.start()
-            except KeyboardInterrupt:
-                print("\nExiting...")
-                self.force_kill_tor()
-                log_msg("Tor", "killed tor subprocess")
-                exit(1)
+            server = Server()
+            server.start()
         if self.test:
             # we are testing
             return True
@@ -69,34 +64,8 @@ class StartServer:
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
             # print the line and clear it
-            print(line, end="\r")
-
-    def force_kill_tor(self):
-        """
-        Force kill the tor process
-        """
-        try:
-            log_msg("force_kill_tor", "Killing tor subprocess")
-            # Find the process IDs (PIDs) of the processes with the given name
-            pid_command = ["pgrep", "-x", "tor"]
-            pid_process = subprocess.Popen(pid_command, stdout=subprocess.PIPE)
-            pid_output, _ = pid_process.communicate()
-            pids = pid_output.decode().strip().split("\n")
-            # Kill each process with the found PIDs
-            if pids:
-                for pid in pids:
-                    kill_command = ["kill", pid]
-                    subprocess.run(kill_command)
-                    print(f"Process tor (PID {pid}) killed.")
-            else:
-                print("No process named tor found.")
-        except Exception as e:
-            print(e)
-        if self.test:
-            # we are testing
-            return True
-
-
+            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
+            print(final_msg, end="\r")
 
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
@@ -141,5 +110,11 @@ class StartServer:
 
 
 if __name__ == "__main__":
-    server = StartServer()
-    server.start()
+    try:
+        server = StartServer()
+        server.start()
+    except KeyboardInterrupt:
+        print("\nExiting...")
+        # run the force kill tor function without creating a new instance of StartServer
+        force_kill_tor()
+        exit(1)

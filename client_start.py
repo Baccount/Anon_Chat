@@ -5,6 +5,8 @@ from stem.process import launch_tor_with_config
 from bridges.downloadbridges import DownloadBridges
 from client.client import Client
 from logging_msg import log_msg
+from colorama import Fore, Style
+from kill_tor import force_kill_tor
 
 
 # path to the tor binary
@@ -47,28 +49,16 @@ class ClientServer:
             log_msg("ClientServer", "start", f"Error: {e}")
         # Add some space
         print("\n" * 2)
-        try:
-            if not self.test:
-                # start the client if not testing
-                client = Client()
-                client.start()
-        except KeyboardInterrupt:
-            log_msg("Client_Start", "start", "keyboard interrupt")
-            print("\nExiting...")
-            self.kill_tor()
-            exit(1)
+        if not self.test:
+            # start the client if not testing
+            client = Client()
+            client.start()
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
             # print the line and clear it
-            print(line, end="\r")
-
-    def kill_tor(self):
-        try:
-            self.tor_bin.kill()
-            log_msg("Client_Start", "kill_tor", "killed tor subprocess")
-        except Exception as e:
-            print(e)
+            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
+            print(final_msg, end="\r")
 
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
@@ -112,5 +102,11 @@ class ClientServer:
                                                                             
 
 if __name__ == "__main__":
-    client = ClientServer()
-    client.start()
+    try:
+        client = ClientServer()
+        client.start()
+    except KeyboardInterrupt:
+        print("\nExiting...")
+        # run the force kill tor function without creating a new instance of StartServer
+        force_kill_tor()
+        exit(1)

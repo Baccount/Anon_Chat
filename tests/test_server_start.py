@@ -14,8 +14,3 @@ class TestServer():
 
     def test_server_tor(self):
         assert  self.server.start() is True
-
-
-
-    def test_server_kill(self):
-        assert self.server.force_kill_tor() is True
