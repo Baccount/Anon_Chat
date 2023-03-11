@@ -8,6 +8,7 @@ from client.connect_tor import ConnectTor
 from client_start import ClientServer
 # trunk-ignore(flake8/E402)
 from client.client import Client
+from kill_tor import force_kill_tor
 
 class TestClient:
     def setup(self):
@@ -22,7 +23,7 @@ class TestClient:
         self.tor = ConnectTor(test=True)
         self.tor.connect_onion("duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion")
         # kill tor
-        self.tor.force_kill_tor()
+        force_kill_tor()
 
 
     def test_decode(self):
@@ -32,8 +33,7 @@ class TestClient:
 
     def test_kill_tor(self):
         # start tor
-        self.tor = ConnectTor(test=True)
-        self.tor.force_kill_tor()
+        force_kill_tor()
         time.sleep(1)
         # check if the tor process is running or not
         pid_command = ["pgrep", "-x", "tor"]
