@@ -46,6 +46,7 @@ class ClientServer:
             )
         except Exception as e:
             # tor is already running
+            log_msg("ClientServer", "start", "Tor is already running")
             log_msg("ClientServer", "start", f"Error: {e}")
         # Add some space
         print("\n" * 2)

@@ -49,7 +49,8 @@ class StartServer:
                 init_msg_handler = self.print_bootstrap_lines,
             )
         except Exception as e:
-            print(e)
+            log_msg("StartServer", "start", "Tor is already running")
+            log_msg("StartServer", "start", f"Error: {e}")
         # Add some space
         print("\n" * 2)
         # start the server if we are Not testing
