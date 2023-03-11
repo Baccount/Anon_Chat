@@ -5,6 +5,7 @@ from stem.process import launch_tor_with_config
 from bridges.downloadbridges import DownloadBridges
 from client.client import Client
 from logging_msg import log_msg
+from colorama import Fore, Style
 
 
 # path to the tor binary
@@ -61,7 +62,8 @@ class ClientServer:
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
             # print the line and clear it
-            print(line, end="\r")
+            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
+            print(final_msg, end="\r")
 
     def kill_tor(self):
         try:

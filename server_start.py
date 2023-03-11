@@ -71,7 +71,6 @@ class StartServer:
         if "Bootstrapped " in line:
             # print the line and clear it
             final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
-
             print(final_msg, end="\r")
 
     def force_kill_tor(self):
