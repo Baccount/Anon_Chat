@@ -45,7 +45,7 @@ class StartServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout = 120, # timeout in seconds
+                timeout = 250, # Increase timeout, bridges take a while to connect
                 init_msg_handler = self.print_bootstrap_lines,
             )
         except Exception as e:
@@ -95,7 +95,7 @@ class StartServer:
             "UseBridges": "1",
             "Bridge": obsf4Bridges,
         }
-        log_msg("StartServer", "use_bridges", f"{self.tor_cfg}")
+        log_msg("StartServer", "use_bridges", f"{self.tor_cfg['Bridge']}")
 
     def show_ascii(self):
         print(
