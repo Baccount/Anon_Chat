@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from stem.process import launch_tor_with_config
-
+from kill_tor import force_kill_tor
 from bridges.downloadbridges import DownloadBridges
 from logging_msg import log_msg
 from server.server import Server
@@ -55,14 +55,8 @@ class StartServer:
         # start the server if we are Not testing
         log_msg("StartServer ", f"Are we testing: {self.test}")
         if self.test is False:
-            try:
-                server = Server()
-                server.start()
-            except KeyboardInterrupt:
-                print("\nExiting...")
-                self.force_kill_tor()
-                log_msg("Tor", "killed tor subprocess")
-                exit(1)
+            server = Server()
+            server.start()
         if self.test:
             # we are testing
             return True
@@ -143,5 +137,11 @@ class StartServer:
 
 
 if __name__ == "__main__":
-    server = StartServer()
-    server.start()
+    try:
+        server = StartServer()
+        server.start()
+    except KeyboardInterrupt:
+        print("\nExiting...")
+        # run the force kill tor function without creating a new instance of StartServer
+        force_kill_tor()
+        exit(1)
