@@ -201,7 +201,7 @@ class Server(Cmd):
         """
         Start the server and listen for incoming connections.
         """
-        print("Do you want to CreateOnion an ephemeral or non-ephemeral hidden service?")
+        print("Do you want to Create an ephemeral or non-ephemeral hidden service?")
         print("1. Ephemeral")
         print("2. Non-ephemeral")
         print("3. Delete private key")
