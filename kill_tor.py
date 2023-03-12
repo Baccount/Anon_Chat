@@ -1,4 +1,4 @@
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, run
 from logging_msg import log_msg
 
 def force_kill_tor():
