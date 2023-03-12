@@ -3,9 +3,6 @@ import json
 from cmd import Cmd
 from .connect_tor import ConnectTor
 from logging_msg import log_msg
-from stem.control import Controller
-from time import sleep
-from stem import connection as stem_connection
 
 
 class Client(Cmd):

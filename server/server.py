@@ -4,9 +4,6 @@ import os
 from cmd import Cmd
 from .server_tor import CreateOnion
 from logging_msg import log_msg
-from stem import connection as stem_connection
-from stem.control import Controller
-from time import sleep
 
 class Server(Cmd):
     """
@@ -156,8 +153,8 @@ class Server(Cmd):
 
         :param connection: The connection with the client.
         """
-        try:
-            while True:
+        while True:
+            try:
                 buffer = connection.recv(1024).decode()
                 log_msg("__waitForLogin", f"buffer: {buffer}")
                 obj = json.loads(buffer)
@@ -179,13 +176,12 @@ class Server(Cmd):
                     thread.setDaemon(True)
                     thread.start()
                     break
-
-        except Exception as e:
-            # this occures when a user disconnects before logging in
-            try:
-                log_msg("__waitForLogin", f"Error: {e}")
             except Exception as e:
-                log_msg("__waitForLogin", f"Error: {e}")
+                try:
+                    log_msg("__waitForLogin", f"Error: {e}")
+                    connection.close()
+                except Exception as e:
+                    log_msg("__waitForLogin", f"Error: {e}")
 
 
 
