@@ -1,7 +1,6 @@
 import socket
 from stem.control import Controller
 from logging_msg import log_msg
-import subprocess
 from stem import ProtocolError
 from kill_tor import force_kill_tor
 import os

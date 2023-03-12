@@ -4,6 +4,7 @@ import os
 from cmd import Cmd
 from .server_tor import CreateOnion
 from logging_msg import log_msg
+from stem import connection as stem_connection
 
 class Server(Cmd):
     """
@@ -135,6 +136,7 @@ class Server(Cmd):
         # Acquire the lock to prevent multiple broadcasts from running simultaneously
         self.__lock.acquire()
         try:
+            self.check_tor()
             log_msg("__broadcast", f"Message: {message}")
             for i in range(len(self.__connections)):
                 if user_id != i and self.__connections[i]:
@@ -146,6 +148,18 @@ class Server(Cmd):
         finally:
             # Release the lock after the broadcast has finished
             self.__lock.release()
+
+    def check_tor(self):
+        """
+    # TODO FINISH IMPLEMENTATION
+        check tor is still running
+        """
+        try:
+            self.tor.controller.authenticate()
+        except stem_connection.AuthenticationFailure as e:
+            log_msg("check_tor", f"AuthenticationFailure: {e}")
+            log_msg("check_tor", "Tor is not running, please start Tor")
+            os._exit(0)
 
     def __waitForLogin(self, connection):
         """
