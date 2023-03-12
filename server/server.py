@@ -5,6 +5,8 @@ from cmd import Cmd
 from .server_tor import CreateOnion
 from logging_msg import log_msg
 from stem import connection as stem_connection
+from stem.control import Controller
+from time import sleep
 
 class Server(Cmd):
     """
@@ -136,7 +138,6 @@ class Server(Cmd):
         # Acquire the lock to prevent multiple broadcasts from running simultaneously
         self.__lock.acquire()
         try:
-            self.check_tor()
             log_msg("__broadcast", f"Message: {message}")
             for i in range(len(self.__connections)):
                 if user_id != i and self.__connections[i]:
@@ -149,17 +150,18 @@ class Server(Cmd):
             # Release the lock after the broadcast has finished
             self.__lock.release()
 
-    def check_tor(self):
+    def check_tor_online(self):
         """
-    # TODO FINISH IMPLEMENTATION
         check tor is still running
         """
-        try:
-            self.tor.controller.authenticate()
-        except stem_connection.AuthenticationFailure as e:
-            log_msg("check_tor", f"AuthenticationFailure: {e}")
-            log_msg("check_tor", "Tor is not running, please start Tor")
-            os._exit(0)
+        c = Controller.from_port(port=9051)
+        while True:
+            try:
+                sleep(20) # run every 20 seconds
+                c.authenticate()
+            except stem_connection.AuthenticationFailure as e:
+                log_msg("check_tor", f"AuthenticationFailure: {e}")
+                log_msg("check_tor", "Tor is not running, please restart the program if you continue to see this message")
 
     def __waitForLogin(self, connection):
         """
@@ -230,6 +232,10 @@ class Server(Cmd):
         else:
             print("Invalid choice")
             self.start()
+        # run the check tor is still running thread
+        thread = threading.Thread(target=self.check_tor_online)
+        thread.setDaemon(True)
+        thread.start()
 
 
         print('[Server] server is running......')
