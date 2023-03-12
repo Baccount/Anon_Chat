@@ -150,19 +150,6 @@ class Server(Cmd):
             # Release the lock after the broadcast has finished
             self.__lock.release()
 
-    def check_tor_online(self):
-        """
-        check tor is still running
-        """
-        c = Controller.from_port(port=9051)
-        while True:
-            try:
-                sleep(20) # run every 20 seconds
-                c.authenticate()
-            except stem_connection.AuthenticationFailure as e:
-                log_msg("check_tor", f"AuthenticationFailure: {e}")
-                log_msg("check_tor", "Tor is not running, please restart the program if you continue to see this message")
-
     def __waitForLogin(self, connection):
         """
         Wait for a client to log in and start a new thread for the client.
@@ -197,8 +184,6 @@ class Server(Cmd):
             # this occures when a user disconnects before logging in
             try:
                 log_msg("__waitForLogin", f"Error: {e}")
-                log_msg("__waitForLogin", f"Disconnected user {len(self.__connections) - 1} ({obj['nickname']})")
-                connection.close()
             except Exception as e:
                 log_msg("__waitForLogin", f"Error: {e}")
 
@@ -232,11 +217,6 @@ class Server(Cmd):
         else:
             print("Invalid choice")
             self.start()
-        # run the check tor is still running thread
-        thread = threading.Thread(target=self.check_tor_online)
-        thread.setDaemon(True)
-        thread.start()
-
 
         print('[Server] server is running......')
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
