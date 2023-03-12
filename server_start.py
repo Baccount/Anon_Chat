@@ -1,5 +1,4 @@
-import os
-import subprocess
+from os import getcwd, path
 
 from stem.process import launch_tor_with_config
 from kill_tor import force_kill_tor
@@ -9,10 +8,10 @@ from server.server import Server
 from colorama import Fore, Style
 
 # path to the tor binary
-tor_dir = os.getcwd() + "/tor/tor"
-obsf4 = os.getcwd() + "/tor/obfs4proxy"
-geo_ip_file = os.getcwd() + "/tor/geoip"
-geo_ipv6_file = os.getcwd() + "/tor/geoip6"
+tor_dir = getcwd() + "/tor/tor"
+obsf4 = getcwd() + "/tor/obfs4proxy"
+geo_ip_file = getcwd() + "/tor/geoip"
+geo_ipv6_file = getcwd() + "/tor/geoip6"
 
 
 class StartServer:
@@ -70,7 +69,7 @@ class StartServer:
 
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
-        if not os.path.exists("bridges.json"):
+        if not path.exists("bridges.json"):
             db = DownloadBridges(protocol="obfs4")
             db.startBridges()
             if not db.checkCaptcha():
