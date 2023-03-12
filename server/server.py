@@ -180,8 +180,10 @@ class Server(Cmd):
                 try:
                     log_msg("__waitForLogin", f"Error: {e}")
                     connection.close()
+                    break
                 except Exception as e:
                     log_msg("__waitForLogin", f"Error: {e}")
+                    break
 
 
 
