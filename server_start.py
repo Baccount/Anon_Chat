@@ -1,5 +1,4 @@
 from os import getcwd, path
-
 from stem.process import launch_tor_with_config
 from kill_tor import force_kill_tor
 from bridges.downloadbridges import DownloadBridges
