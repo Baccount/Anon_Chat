@@ -33,7 +33,7 @@ class Server(Cmd):
         - nickname (str, optional): The nickname of the user. Default is "NONE".
         """
         try:
-            print('[Server] user', user_id, nickname, 'exit chat room')
+            log_msg("disconnectUsr", f'[Server] user {user_id}, {nickname}, exit chat room')
             self.__connections[user_id].close()
             # remove the user from the list
             self.__connections[user_id] = None
@@ -153,8 +153,8 @@ class Server(Cmd):
 
         :param connection: The connection with the client.
         """
-        try:
-            while True:
+        while True:
+            try:
                 buffer = connection.recv(1024).decode()
                 log_msg("__waitForLogin", f"buffer: {buffer}")
                 obj = json.loads(buffer)
@@ -176,15 +176,14 @@ class Server(Cmd):
                     thread.setDaemon(True)
                     thread.start()
                     break
-
-        except Exception as e:
-            # this occures when a user disconnects before logging in
-            try:
-                log_msg("__waitForLogin", f"Error: {e}")
-                log_msg("__waitForLogin", f"Disconnected user {len(self.__connections) - 1} ({obj['nickname']})")
-                connection.close()
             except Exception as e:
-                log_msg("__waitForLogin", f"Error: {e}")
+                try:
+                    log_msg("__waitForLogin", f"Error: {e}")
+                    connection.close()
+                    break
+                except Exception as e:
+                    log_msg("__waitForLogin", f"Error: {e}")
+                    break
 
 
 
@@ -216,7 +215,6 @@ class Server(Cmd):
         else:
             print("Invalid choice")
             self.start()
-
 
         print('[Server] server is running......')
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))

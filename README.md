@@ -48,3 +48,4 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
         login <username>
 - `logout` - "Logout" - Logs out of the chat room
 - `o` - "Show Onion Address" - Displays the Onion Address of the server
+- `quit` - "Quit" - Quits the chat room
