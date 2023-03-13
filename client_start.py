@@ -4,6 +4,7 @@ from bridges.downloadbridges import DownloadBridges
 from client.client import Client
 from logging_msg import log_msg
 from colorama import Fore, Style
+from kill_tor import force_kill_tor
 
 
 # path to the tor binary
@@ -105,6 +106,5 @@ if __name__ == "__main__":
         client.start()
     except KeyboardInterrupt:
         print("\nExiting...")
-        # run the force kill tor function without creating a new instance of StartServer
-        #force_kill_tor()
+        force_kill_tor()
         exit(1)
