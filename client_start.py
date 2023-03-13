@@ -4,7 +4,6 @@ from bridges.downloadbridges import DownloadBridges
 from client.client import Client
 from logging_msg import log_msg
 from colorama import Fore, Style
-from kill_tor import force_kill_tor
 
 
 # path to the tor binary
