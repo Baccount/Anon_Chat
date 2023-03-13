@@ -33,7 +33,7 @@ class Server(Cmd):
         - nickname (str, optional): The nickname of the user. Default is "NONE".
         """
         try:
-            print('[Server] user', user_id, nickname, 'exit chat room')
+            log_msg("disconnectUsr", f'[Server] user {user_id}, {nickname}, exit chat room')
             self.__connections[user_id].close()
             # remove the user from the list
             self.__connections[user_id] = None

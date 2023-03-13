@@ -184,6 +184,7 @@ class Client(Cmd):
         print('o - show onion address')
         print('logout - logout from the chat room')
         print('h - show help menu')
+        print('q - quit the chat room')
 
     def g(self, text):
         # return green text
@@ -193,3 +194,12 @@ class Client(Cmd):
         # print the onion address
         onion = self.g(self.onion_address)
         print(f"{onion}")
+
+    def do_q(self, args=None):
+        """
+        Quit the chat room.
+        """
+        self.do_logout()
+        exit(0)
+        # exit without calling force kill tor for now
+        #force_kill_tor()
