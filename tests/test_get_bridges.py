@@ -16,12 +16,12 @@ class TestDownloadBridges:
         self.db = DownloadBridges(protocol="obfs4", test=True)
         # test connect Meek
         assert self.db.connectMeek() is True
-
-    def test_getCaptcha(self):
-        assert self.db.getCaptcha() is True
     @pytest.mark.skipif(
     getenv("GITHUB_ACTIONS") == "true", reason="Skipping test on GitHub Actions"
     )
+    def test_getCaptcha(self):
+        assert self.db.getCaptcha() is True
+
     def test_display_image(self):
         assert self.db.display_image() is True
     @pytest.mark.skipif(
