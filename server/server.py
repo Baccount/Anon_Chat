@@ -12,7 +12,7 @@ class Server(Cmd):
     prompt = ''
     intro = '[Welcome] Server Operator \n'
 
-    def __init__(self):
+    def __init__(self, test_enabled=False):
         """
         structure
         """
@@ -23,6 +23,7 @@ class Server(Cmd):
         self.__nicknames = list()
         self.__lock = threading.Lock()
         self.onion_address = None
+        self.test_enabled = test_enabled
 
     def disconnectUsr(self, user_id, nickname="NONE"):
         """
@@ -206,21 +207,26 @@ class Server(Cmd):
         """
         Start the server and listen for incoming connections.
         """
-        print("Do you want to Create an ephemeral or non-ephemeral hidden service?")
-        print("1. Ephemeral")
-        print("2. Non-ephemeral")
-        print("3. Delete private key")
-        choice = input("Enter choice: ")
-        if choice == "1":
+        if self.test_enabled is False:
+            # we are Not testing, so ask for user input
+            print("Do you want to Create an ephemeral or non-ephemeral hidden service?")
+            print("1. Ephemeral")
+            print("2. Non-ephemeral")
+            print("3. Delete private key")
+            choice = input("Enter choice: ")
+            if choice == "1":
+                response = self.tor.ephemeral_onion()
+            elif choice == "2":
+                response = self.tor.non_ephemeral_onion()
+            elif choice == "3":
+                self.delete_private_key()
+                self.start()
+            else:
+                print("Invalid choice")
+                self.start()
+        elif self.test_enabled is True:
+            # we are testing, so use the ephemeral onion
             response = self.tor.ephemeral_onion()
-        elif choice == "2":
-            response = self.tor.non_ephemeral_onion()
-        elif choice == "3":
-            self.delete_private_key()
-            self.start()
-        else:
-            print("Invalid choice")
-            self.start()
 
         print('[Server] server is running......')
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))

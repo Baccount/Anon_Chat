@@ -72,7 +72,8 @@ class StartServer:
         # start the server if we are Not testing
         log_msg("StartServer ", f"Are we testing: {self.test}")
         if self.test is False:
-            server = Server()
+            # test_enabled uses ephemeral by default
+            server = Server(test_enabled)
             server.start()
         if self.test:
             # we are testing
