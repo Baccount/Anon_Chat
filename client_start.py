@@ -5,6 +5,24 @@ from client.client import Client
 from logging_msg import log_msg
 from colorama import Fore, Style
 from kill_tor import force_kill_tor
+import argparse
+
+# Create an ArgumentParser object
+parser = argparse.ArgumentParser()
+
+# Add an argument to specify a boolean value
+parser.add_argument('-t', '--test', action='store_true', dest='test_enabled',
+                    help='Enable testing mode, disables bridges')
+
+try:
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Store the boolean flag in a variable False by default
+    test_enabled = False
+    test_enabled = args.test_enabled
+except Exception as e:
+    log_msg("argparse", "error", f"Error: {e}")
 
 
 # path to the tor binary
@@ -27,7 +45,7 @@ class ClientServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if self.test is False:
+        if self.test is False and test_enabled is False:
             choice = input("Use bridges? (y/n) ")
             if choice == "y" or choice == "Y":
                 self.use_bridges()
