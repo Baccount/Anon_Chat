@@ -1,10 +1,35 @@
+import argparse
 from os import getcwd, path
+
+from colorama import Fore, Style
 from stem.process import launch_tor_with_config
+
 from bridges.downloadbridges import DownloadBridges
 from client.client import Client
-from logging_msg import log_msg
-from colorama import Fore, Style
 from kill_tor import force_kill_tor
+from logging_msg import log_msg
+
+# Create an ArgumentParser object
+parser = argparse.ArgumentParser()
+
+# Add an argument to specify a boolean value
+parser.add_argument(
+    "-t",
+    "--test",
+    action="store_true",
+    dest="test_enabled",
+    help="Enable testing mode, disables bridges",
+)
+
+try:
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Store the boolean flag in a variable False by default
+    test_enabled = False
+    test_enabled = args.test_enabled
+except Exception as e:
+    log_msg("argparse", "error", f"Error: {e}")
 
 
 # path to the tor binary
@@ -27,7 +52,7 @@ class ClientServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if self.test is False:
+        if self.test is False and test_enabled is False:
             choice = input("Use bridges? (y/n) ")
             if choice == "y" or choice == "Y":
                 self.use_bridges()
@@ -39,8 +64,8 @@ class ClientServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout = 250, # Increase timeout, bridges take a while to connect
-                init_msg_handler = self.print_bootstrap_lines,
+                timeout=250,  # Increase timeout, bridges take a while to connect
+                init_msg_handler=self.print_bootstrap_lines,
             )
         except Exception as e:
             # tor is already running
@@ -71,7 +96,11 @@ class ClientServer:
             db.cleanup()
             obsf4Bridges = db.readBridges()
         else:
-            log_msg("StartServer","use_bridges", "bridges.json exists, using bridges from file")
+            log_msg(
+                "StartServer",
+                "use_bridges",
+                "bridges.json exists, using bridges from file",
+            )
             db = DownloadBridges()
             obsf4Bridges = db.readBridges()
         self.tor_cfg = {
@@ -86,8 +115,10 @@ class ClientServer:
             "UseBridges": "1",
             "Bridge": obsf4Bridges,
         }
+
     def show_ascii(self):
-        print("""
+        print(
+            """
                d8888                             .d8888b.  888               888    
               d88888                            d88P  Y88b 888               888    
              d88P888                            888    888 888               888    
@@ -95,10 +126,9 @@ class ClientServer:
            d88P  888 888 "88b d88""88b 888 "88b 888        888 "88b     "88b 888    
           d88P   888 888  888 888  888 888  888 888    888 888  888 .d888888 888    
          d8888888888 888  888 Y88..88P 888  888 Y88b  d88P 888  888 888  888 Y88b.  
-        d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888 \n""")
-                                                                            
-                                                                            
-                                                                            
+        d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888 \n"""
+        )
+
 
 if __name__ == "__main__":
     try:

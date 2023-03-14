@@ -1,10 +1,35 @@
+import argparse
 from os import getcwd, path
+
+from colorama import Fore, Style
 from stem.process import launch_tor_with_config
-from kill_tor import force_kill_tor
+
 from bridges.downloadbridges import DownloadBridges
+from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
-from colorama import Fore, Style
+
+# Create an ArgumentParser object
+parser = argparse.ArgumentParser()
+
+# Add an argument to specify a boolean value
+parser.add_argument(
+    "-t",
+    "--test",
+    action="store_true",
+    dest="test_enabled",
+    help="Enable testing mode, disables bridges",
+)
+
+try:
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Store the boolean flag in a variable False by default
+    test_enabled = False
+    test_enabled = args.test_enabled
+except Exception as e:
+    log_msg("argparse", "error", f"Error: {e}")
 
 # path to the tor binary
 tor_dir = getcwd() + "/tor/tor"
@@ -26,7 +51,7 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if self.test is False:
+        if self.test is False and test_enabled is False:
             # we are not testing
             choice = input("Use bridges? (y/n) ")
             if choice == "y" or choice == "Y":
@@ -43,8 +68,8 @@ class StartServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout = 250, # Increase timeout, bridges take a while to connect
-                init_msg_handler = self.print_bootstrap_lines,
+                timeout=250,  # Increase timeout, bridges take a while to connect
+                init_msg_handler=self.print_bootstrap_lines,
             )
         except Exception as e:
             log_msg("StartServer", "start", "Tor is already running")
@@ -52,9 +77,10 @@ class StartServer:
         # Add some space
         print("\n" * 2)
         # start the server if we are Not testing
-        log_msg("StartServer ", f"Are we testing: {self.test}")
+        log_msg("StartServer", f" Are we using pytest: {self.test}")
         if self.test is False:
-            server = Server()
+            # if test_enabled == True, use ephemeral by default
+            server = Server(test_enabled)
             server.start()
         if self.test:
             # we are testing
@@ -78,7 +104,11 @@ class StartServer:
             db.cleanup()
             obsf4Bridges = db.readBridges()
         else:
-            log_msg("StartServer","use_bridges", "bridges.json exists, using bridges from file")
+            log_msg(
+                "StartServer",
+                "use_bridges",
+                "bridges.json exists, using bridges from file",
+            )
             db = DownloadBridges()
             obsf4Bridges = db.readBridges()
         self.tor_cfg = {
@@ -107,7 +137,8 @@ class StartServer:
           d88P   888 888  888 888  888 888  888 888    888 888  888 .d888888 888               "888 88888888 888     Y88  88P 88888888 888     
          d8888888888 888  888 Y88..88P 888  888 Y88b  d88P 888  888 888  888 Y88b.       Y88b  d88P Y8b.     888      Y8bd8P  Y8b.     888     
         d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888       "Y8888P"   "Y8888  888       Y88P    "Y8888  888     
-            """)
+            """
+        )
 
 
 if __name__ == "__main__":

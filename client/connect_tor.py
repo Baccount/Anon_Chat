@@ -1,11 +1,12 @@
-import socks
 import socket
-import subprocess
-from logging_msg import log_msg
+
+import socks
+
 from kill_tor import force_kill_tor
+from logging_msg import log_msg
+
 
 class ConnectTor(object):
-
     def __init__(self, test=False):
         self.test = test
         try:
@@ -18,9 +19,22 @@ class ConnectTor(object):
             exit(1)
 
     def connect_onion(self, onion):
-        log_msg("connect_tor", "connect_onion", f"connecting to {onion}")
-        self.server = (onion, 80)
-        self.socket.connect(self.server)
+        """
+        Description: Connect to the onion address
+
+        Return: True if connected to the onion address else False
+        """
+        try:
+            log_msg("connect_tor", "connect_onion", f"connecting to {onion}")
+            self.server = (onion, 80)
+            self.socket.connect(self.server)
+            return True
+        except Exception as e:
+            log_msg("connect_tor", "connect_onion", f"Error: {e}")
+            # reset the socket
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            log_msg("connect_tor", "connect_onion", "Reseting socket")
+            return False
         if self.test:
             # were testing
             return True
