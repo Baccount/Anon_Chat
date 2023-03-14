@@ -1,17 +1,19 @@
-import threading
 import json
+import threading
 from cmd import Cmd
-from .connect_tor import ConnectTor
+
 from logging_msg import log_msg
 
+from .connect_tor import ConnectTor
 
 
 class Client(Cmd):
     """
     client
     """
-    prompt = ''
-    intro = 'Welcom to AnonChat \n'
+
+    prompt = ""
+    intro = "Welcom to AnonChat \n"
 
     def __init__(self):
         """
@@ -34,14 +36,14 @@ class Client(Cmd):
                 buffer = self.tor.socket.recv(1024).decode()
                 decoded = self.decode(buffer)
                 if not decoded:
-                    log_msg("__receive_message_thread","Message not decoded", buffer)
+                    log_msg("__receive_message_thread", "Message not decoded", buffer)
                     exit()
                     break
                 for i in decoded:
                     obj = json.loads(i)
-                    print('[' + str(obj['sender_nickname']) + ']', obj['message'])
+                    print("[" + str(obj["sender_nickname"]) + "]", obj["message"])
             except Exception as e:
-                log_msg("__receive_message_thread","Exception ", e)
+                log_msg("__receive_message_thread", "Exception ", e)
                 self.__isLogin = False
                 break
 
@@ -54,22 +56,21 @@ class Client(Cmd):
         """
         objects = []
         start = 0
-        end = buffer.find('{', start)
+        end = buffer.find("{", start)
         while end != -1:
             start = end
             count = 1
             end = start + 1
             while count > 0 and end < len(buffer):
-                if buffer[end] == '{':
+                if buffer[end] == "{":
                     count += 1
-                elif buffer[end] == '}':
+                elif buffer[end] == "}":
                     count -= 1
                 end += 1
             objects.append(buffer[start:end])
             start = end
-            end = buffer.find('{', start)
+            end = buffer.find("{", start)
         return objects
-
 
     def __send_message_thread(self, message):
         """
@@ -78,11 +79,11 @@ class Client(Cmd):
         :param message: The message to be sent.
         """
         try:
-            self.tor.socket.send(json.dumps({
-                'type': 'broadcast',
-                'sender_id': self.__id,
-                'message': message
-            }).encode())
+            self.tor.socket.send(
+                json.dumps(
+                    {"type": "broadcast", "sender_id": self.__id, "message": message}
+                ).encode()
+            )
         except BrokenPipeError as e:
             log_msg("__send_message_thread", "BrokenPipeError", e)
             exit(0)
@@ -101,7 +102,7 @@ class Client(Cmd):
         # start tor onion service
         if not self.tor.connect_onion(onion):
             # Onion service not found, ask user to try again
-            print(self.red('Onion service not found, please try again'))
+            print(self.red("Onion service not found, please try again"))
             self.start()
         self.cmdloop()
 
@@ -111,33 +112,30 @@ class Client(Cmd):
 
         :param args: The nickname to be used for the login.
         """
-        nickname = args.split(' ')[0]
+        nickname = args.split(" ")[0]
 
         # only login once
         if not self.__isLogin:
             # Send the nickname to the server to get the user id
-            self.tor.socket.send(json.dumps({
-                'type': 'login',
-                'nickname': nickname
-            }).encode())
-
+            self.tor.socket.send(
+                json.dumps({"type": "login", "nickname": nickname}).encode()
+            )
 
             try:
                 buffer = self.tor.socket.recv(1024).decode()
                 print(buffer)
                 obj = json.loads(buffer)
-                if obj['id']:
+                if obj["id"]:
                     # if id = -1 means the nickname is already in use
-                    if obj['id'] == -1:
-                        print('[Client] The nickname is already in use')
+                    if obj["id"] == -1:
+                        print("[Client] The nickname is already in use")
                         log_msg("do_login", "The nickname is already in use")
                         return
                     self.__nickname = nickname
-                    self.__id = obj['id']
+                    self.__id = obj["id"]
                     self.__isLogin = True
-                    print('[Client] Successfully logged into the chat room')
+                    print("[Client] Successfully logged into the chat room")
                     log_msg("do_login", "Successfully logged into the chat room")
-
 
                     thread = threading.Thread(target=self.__receive_message_thread)
                     thread.setDaemon(True)
@@ -147,7 +145,7 @@ class Client(Cmd):
                 log_msg("do_login", "Exception ", e)
                 exit(0)
         else:
-            print('[Client] You have already logged in')
+            print("[Client] You have already logged in")
             log_msg("do_login", "You have already logged in")
 
     def do_s(self, args):
@@ -160,23 +158,24 @@ class Client(Cmd):
         if self.__isLogin:
             message = args
             # Show messages sent by yourself
-            print('[' + str(self.__nickname) + ']', message)
+            print("[" + str(self.__nickname) + "]", message)
             # Open child thread for sending data
-            thread = threading.Thread(target=self.__send_message_thread, args=(message,))
+            thread = threading.Thread(
+                target=self.__send_message_thread, args=(message,)
+            )
             thread.setDaemon(True)
             thread.start()
         else:
-            print('[Client] You have not logged in yet')
+            print("[Client] You have not logged in yet")
             log_msg("do_s", "You have not logged in yet")
 
     def do_logout(self, args=None):
         """
         Logout from the chat room.
         """
-        self.tor.socket.send(json.dumps({
-            'type': 'logout',
-            'sender_id': self.__id
-        }).encode())
+        self.tor.socket.send(
+            json.dumps({"type": "logout", "sender_id": self.__id}).encode()
+        )
         self.__isLogin = False
         log_msg("do_logout", "You have logged out")
         return True
@@ -185,16 +184,16 @@ class Client(Cmd):
         """
         Show help menu.
         """
-        print('login <nickname> - login to the chat room')
-        print('s - send message from server to all clients')
-        print('o - show onion address')
-        print('logout - logout from the chat room')
-        print('h - show help menu')
-        print('q - quit the chat room')
+        print("login <nickname> - login to the chat room")
+        print("s - send message from server to all clients")
+        print("o - show onion address")
+        print("logout - logout from the chat room")
+        print("h - show help menu")
+        print("q - quit the chat room")
 
     def g(self, text):
         # return green text
-        return '\033[92m' + text + '\033[0m'
+        return "\033[92m" + text + "\033[0m"
 
     def do_o(self, args):
         # print the onion address
@@ -208,7 +207,7 @@ class Client(Cmd):
         self.do_logout()
         exit(0)
         # exit without calling force kill tor for now
-        #force_kill_tor()
+        # force_kill_tor()
 
     def red(self, msg):
         return f"\033[31m{msg}\033[0m"

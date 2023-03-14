@@ -1,11 +1,12 @@
-import socks
 import socket
-import subprocess
-from logging_msg import log_msg
+
+import socks
+
 from kill_tor import force_kill_tor
+from logging_msg import log_msg
+
 
 class ConnectTor(object):
-
     def __init__(self, test=False):
         self.test = test
         try:
@@ -20,7 +21,7 @@ class ConnectTor(object):
     def connect_onion(self, onion):
         """
         Description: Connect to the onion address
-        
+
         Return: True if connected to the onion address else False
         """
         try:

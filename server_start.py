@@ -1,18 +1,25 @@
+import argparse
 from os import getcwd, path
+
+from colorama import Fore, Style
 from stem.process import launch_tor_with_config
-from kill_tor import force_kill_tor
+
 from bridges.downloadbridges import DownloadBridges
+from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
-from colorama import Fore, Style
-import argparse
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
 
 # Add an argument to specify a boolean value
-parser.add_argument('-t', '--test', action='store_true', dest='test_enabled',
-                    help='Enable testing mode, disables bridges')
+parser.add_argument(
+    "-t",
+    "--test",
+    action="store_true",
+    dest="test_enabled",
+    help="Enable testing mode, disables bridges",
+)
 
 try:
     # Parse the arguments
@@ -61,8 +68,8 @@ class StartServer:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
-                timeout = 250, # Increase timeout, bridges take a while to connect
-                init_msg_handler = self.print_bootstrap_lines,
+                timeout=250,  # Increase timeout, bridges take a while to connect
+                init_msg_handler=self.print_bootstrap_lines,
             )
         except Exception as e:
             log_msg("StartServer", "start", "Tor is already running")
@@ -97,7 +104,11 @@ class StartServer:
             db.cleanup()
             obsf4Bridges = db.readBridges()
         else:
-            log_msg("StartServer","use_bridges", "bridges.json exists, using bridges from file")
+            log_msg(
+                "StartServer",
+                "use_bridges",
+                "bridges.json exists, using bridges from file",
+            )
             db = DownloadBridges()
             obsf4Bridges = db.readBridges()
         self.tor_cfg = {
@@ -126,7 +137,8 @@ class StartServer:
           d88P   888 888  888 888  888 888  888 888    888 888  888 .d888888 888               "888 88888888 888     Y88  88P 88888888 888     
          d8888888888 888  888 Y88..88P 888  888 Y88b  d88P 888  888 888  888 Y88b.       Y88b  d88P Y8b.     888      Y8bd8P  Y8b.     888     
         d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888       "Y8888P"   "Y8888  888       Y88P    "Y8888  888     
-            """)
+            """
+        )
 
 
 if __name__ == "__main__":
