@@ -34,6 +34,7 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
         python client_start.py
 
 <p align="center"> <img src="screenshots/server.png"></p>
+
 ## Commands
 
 ### Server Commands
