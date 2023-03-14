@@ -97,7 +97,10 @@ class Client(Cmd):
         onion = input("Enter your onion address: ")
         self.onion_address = onion
         # start tor onion service
-        self.tor.connect_onion(onion)
+        if not self.tor.connect_onion(onion):
+            # Onion service not found, ask user to try again
+            print(self.red('Onion service not found, please try again'))
+            self.start()
         self.cmdloop()
 
     def do_login(self, args):
@@ -204,3 +207,6 @@ class Client(Cmd):
         exit(0)
         # exit without calling force kill tor for now
         #force_kill_tor()
+
+    def red(self, msg):
+        return f"\033[31m{msg}\033[0m"
