@@ -95,6 +95,8 @@ class Client(Cmd):
         Connect to the server using the onion address.
         """
         onion = input("Enter your onion address: ")
+        if onion == "quit" or onion == "exit" or onion == "q":
+            exit(0)
         self.onion_address = onion
         # start tor onion service
         if not self.tor.connect_onion(onion):
