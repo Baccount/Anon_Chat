@@ -103,8 +103,6 @@ class Server(Cmd):
         nickname = self.__nicknames[user_id]
         log_msg("__user_thread", f'[Server] user {user_id} ({nickname}) joined the chat room')
 
-        disconnected = False
-
         while True:
             try:
                 buffer = b''
