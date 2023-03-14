@@ -1,4 +1,5 @@
-![](https://github.com/Baccount/Anon_Chat/actions/workflows/python-app.yml/badge.svg)
+
+<p align="right"> <img src="https://github.com/Baccount/Anon_Chat/actions/workflows/python-app.yml/badge.svg"></p>
 
 <p align="center"> <img src="screenshots/icon.png" width=25% height=25%></p>
 
