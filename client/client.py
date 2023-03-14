@@ -200,5 +200,6 @@ class Client(Cmd):
         Quit the chat room.
         """
         self.do_logout()
+        exit(0)
         # exit without calling force kill tor for now
         #force_kill_tor()
