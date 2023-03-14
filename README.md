@@ -55,7 +55,7 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 
 ### Server Arguments
 
-- `--test` or `-t` - Runs the server in test mode and skips asking user for bridges. Ephermal onion service is created by default.
+- `--test` or `-t` - Runs the server in test mode and skips asking user for bridges. Ephemeral onion service is created by default.
 
 ### Client Arguments
 
