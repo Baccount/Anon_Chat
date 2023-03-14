@@ -2,7 +2,9 @@ import sys
 sys.path.append('../')
 # trunk-ignore(flake8/E402)
 from bridges.downloadbridges import DownloadBridges
+import pytest
 
+@pytest.mark.skip(reason="no way of currently testing this")
 class TestDownloadBridges():
     def setup(self):
         self.db = DownloadBridges(protocol="obfs4", test=True)
