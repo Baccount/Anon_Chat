@@ -49,3 +49,10 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 - `logout` - "Logout" - Logs out of the chat room
 - `o` - "Show Onion Address" - Displays the Onion Address of the server
 - `quit` - "Quit" - Quits the chat room
+
+## Arguments
+### Server Arguments
+- `--test` or `-t` - Runs the server in test mode and skips asking user for bridges. Ephermal onion service is created by default.
+
+### Client Arguments
+- `--test` or `-t` - Skips asking user for bridges
