@@ -33,9 +33,12 @@ class Server(Cmd):
         - user_id (int): The ID of the user to be disconnected.
         - nickname (str, optional): The nickname of the user. Default is "NONE".
         """
-        print("YOOOOOOO")
+        # check if the user is in the list if not return
+        if self.__connections[user_id] is None:
+            log_msg("Server", "disconnectUsr", f' user {user_id}, {nickname}, already disconnected')
+            return
         try:
-            log_msg("disconnectUsr", f'[Server] user {user_id}, {nickname}, exit chat room')
+            log_msg("Server", "disconnectUsr", f'user {user_id}, {nickname}, exit chat room')
             self.__connections[user_id].close()
             # remove the user from the list
             self.__connections[user_id] = None
@@ -82,10 +85,14 @@ class Server(Cmd):
             self.__broadcast(obj['sender_id'], obj['message'])
         elif obj['type'] == 'logout':
             self.__broadcast(message=f'user {nickname} ({user_id}) has exited the chat room')
-            self.disconnectUsr(user_id, nickname)
+            if self.__connections[user_id]:
+                # user still connected, disconnect them
+                self.disconnectUsr(user_id, nickname)
         else:
             log_msg("decode_buffer", f"Unknown object type: {obj['type']}")
-            self.disconnectUsr(user_id, nickname)
+            if self.__connections[user_id]:
+                # user still connected, disconnect them
+                self.disconnectUsr(user_id, nickname)
 
     def __user_thread(self, user_id):
         """
@@ -104,16 +111,16 @@ class Server(Cmd):
                 chunk = connection.recv(1024)
                 log_msg("__user_thread", f"chunk: {chunk}")
 
-                if chunk == b'' and disconnected == False:
+                if chunk == b'' and self.__connections[user_id]:
+                    # user still connected, disconnect them
                     self.disconnectUsr(user_id, nickname)
-                    disconnected = True
                     break
 
-                if chunk and disconnected == False:
+                if chunk:
                     buffer += chunk
-                else:
+                elif self.__connections[user_id]:
+                    # user still connected, disconnect them
                     self.disconnectUsr(user_id, nickname)
-                    disconnected = True
                     break
 
                 buffer = self.decode_buffer(buffer)
@@ -128,8 +135,11 @@ class Server(Cmd):
             except Exception as e:
                 log_msg("__user_thread", f"Error: {e}")
                 log_msg("__user_thread", f"Disconnected user {user_id} ({nickname})")
-                self.disconnectUsr(user_id, nickname)
-                disconnected = True
+                if self.__connections[user_id] is None:
+                    # we already disconnected the user
+                    log_msg("__user_thread", f"Error: {e}")
+                    log_msg("Server", "disconnectUsr", f' user {user_id}, {nickname}, already disconnected')
+                    self.disconnectUsr(user_id, nickname)
                 break
 
 
