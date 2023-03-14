@@ -2,3 +2,4 @@ stem
 pysocks
 colorama
 requests
+PIL
