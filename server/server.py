@@ -104,12 +104,12 @@ class Server(Cmd):
                 chunk = connection.recv(1024)
                 log_msg("__user_thread", f"chunk: {chunk}")
 
-                if chunk == b'' and self.disconnected == False:
+                if chunk == b'' and disconnected == False:
                     self.disconnectUsr(user_id, nickname)
                     disconnected = True
                     break
 
-                if chunk and self.disconnected == False:
+                if chunk and disconnected == False:
                     buffer += chunk
                 else:
                     self.disconnectUsr(user_id, nickname)
