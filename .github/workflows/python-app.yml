@@ -8,6 +8,12 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+# exclude a file from the test suite
+  paths-ignore:
+    ["test_get_bridges.py"]
+
+
+
 
 permissions:
   contents: read
@@ -35,4 +41,4 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run pytest with exclusion
-      run: pytest --ignore=test_get_bridges.py
+      run: pytest
