@@ -4,7 +4,7 @@
 <p align="center"> <img src="screenshots/icon.png" width=25% height=25%></p>
 
 # AnonChat - Secure Terminal Chatroom Over Tor Onion Service
-![](screenshots/client.png?raw=true)
+<p align="center"> <img src="screenshots/client.png"></p>
 
 AnonChat is a secure, anonymous, and terminal-based chatroom application that operates over the Tor network. With AnonChat, you can communicate with others in a private and encrypted manner, ensuring that your conversations remain untraceable and protected from prying eyes.
 
@@ -33,7 +33,7 @@ AnonChat can be installed and run on most operating systems, including macOS, Li
 
         python client_start.py
 
-![](screenshots/server.png?raw=true)
+<p align="center"> <img src="screenshots/server.png"></p>
 ## Commands
 
 ### Server Commands
