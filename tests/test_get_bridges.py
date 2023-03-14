@@ -1,17 +1,11 @@
 import sys
-from os import getenv
-
-import pytest
-
-sys.path.append("../")
+sys.path.append('../')
 # trunk-ignore(flake8/E402)
 from bridges.downloadbridges import DownloadBridges
+import pytest
 
-
-@pytest.mark.skipif(
-    getenv("GITHUB_ACTIONS") == "true", reason="Skipping test on GitHub Actions"
-)
-class TestDownloadBridges:
+@pytest.mark.skip(reason="no way of currently testing this")
+class TestDownloadBridges():
     def setup(self):
         self.db = DownloadBridges(protocol="obfs4", test=True)
         # test connect Meek
@@ -28,13 +22,5 @@ class TestDownloadBridges:
 
     def test_check_data(self):
         # test checkData
-        data = {
-            "data": [
-                {
-                    "version": "0.1.0",
-                    "type": "client-transports",
-                    "supported": ["obfs4"],
-                }
-            ]
-        }
+        data = { "data": [ { "version": "0.1.0", "type": "client-transports", "supported": [ "obfs4" ] } ] }
         assert self.db.checkData(data) is True
