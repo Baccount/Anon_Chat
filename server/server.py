@@ -32,6 +32,7 @@ class Server(Cmd):
         - user_id (int): The ID of the user to be disconnected.
         - nickname (str, optional): The nickname of the user. Default is "NONE".
         """
+        print("YOOOOOOO")
         try:
             log_msg("disconnectUsr", f'[Server] user {user_id}, {nickname}, exit chat room')
             self.__connections[user_id].close()
@@ -94,20 +95,24 @@ class Server(Cmd):
         nickname = self.__nicknames[user_id]
         log_msg("__user_thread", f'[Server] user {user_id} ({nickname}) joined the chat room')
 
+        disconnected = False
+
         while True:
             try:
                 buffer = b''
                 chunk = connection.recv(1024)
                 log_msg("__user_thread", f"chunk: {chunk}")
 
-                if chunk == b'':
+                if chunk == b'' and self.disconnected == False:
                     self.disconnectUsr(user_id, nickname)
+                    disconnected = True
                     break
 
-                if chunk:
+                if chunk and self.disconnected == False:
                     buffer += chunk
                 else:
                     self.disconnectUsr(user_id, nickname)
+                    disconnected = True
                     break
 
                 buffer = self.decode_buffer(buffer)
@@ -123,6 +128,7 @@ class Server(Cmd):
                 log_msg("__user_thread", f"Error: {e}")
                 log_msg("__user_thread", f"Disconnected user {user_id} ({nickname})")
                 self.disconnectUsr(user_id, nickname)
+                disconnected = True
                 break
 
 

@@ -31,12 +31,12 @@ class Client(Cmd):
         while self.__isLogin:
             try:
                 buffer = self.tor.socket.recv(1024).decode()
-                stripped = self.decode(buffer)
-                if not stripped:
-                    log_msg("__receive_message_thread","Message not stripped")
+                decoded = self.decode(buffer)
+                if not decoded:
+                    log_msg("__receive_message_thread","Message not decoded", buffer)
                     exit()
                     break
-                for i in stripped:
+                for i in decoded:
                     obj = json.loads(i)
                     print('[' + str(obj['sender_nickname']) + ']', obj['message'])
             except Exception as e:
