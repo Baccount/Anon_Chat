@@ -1,12 +1,14 @@
-import base64
-import io
-import json
-import os
+from base64 import b64decode
+from io import BytesIO
+from json import dump, load
+from os import path
+
 import requests
 from PIL import Image
-from logging_msg import log_msg
-from .meek import Meek
 
+from logging_msg import log_msg
+
+from .meek import Meek
 
 
 class DownloadBridges:
@@ -14,14 +16,13 @@ class DownloadBridges:
         self.protocol = protocol
         self.test = test
 
-
     def startBridges(self):
         self.connectMeek()
         self.getCaptcha()
         self.display_image()
 
     def connectMeek(self):
-        self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
+        self.meek_path = path.join(path.dirname(__file__), "meek-client")
         log_msg("DownloadBridges", "__init__", "Meek path: " + self.meek_path)
 
         self.meek = Meek(self.meek_path)
@@ -52,7 +53,9 @@ class DownloadBridges:
             self.transport = moat_res["data"][0]["transport"]
             self.image = moat_res["data"][0]["image"]
             self.challenge = moat_res["data"][0]["challenge"]
-            log_msg("DownloadBridges", "getCaptcha", f"Moat Challenge: {self.challenge}")
+            log_msg(
+                "DownloadBridges", "getCaptcha", f"Moat Challenge: {self.challenge}"
+            )
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
@@ -63,8 +66,8 @@ class DownloadBridges:
     def display_image(self):
         try:
             base64_image_data = self.image
-            image_data = base64.b64decode(base64_image_data)
-            image = Image.open(io.BytesIO(image_data))
+            image_data = b64decode(base64_image_data)
+            image = Image.open(BytesIO(image_data))
             image.show()
         except Exception as e:
             log_msg("DownloadBridges", "display_image", f"Error: {e}")
@@ -98,16 +101,20 @@ class DownloadBridges:
                 },
             )
             if self.bridge.status_code != 200:
-                log_msg(self.red("DownloadBridges"), self.red("checkCaptcha", "Server Error: " + str(self.bridge.status_code)))
+                log_msg(
+                    self.red("DownloadBridges"),
+                    self.red(
+                        "checkCaptcha", "Server Error: " + str(self.bridge.status_code)
+                    ),
+                )
                 return False
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
         return self.checkData()
 
-
     def checkData(self, data=None):
-        """ Check the data
+        """Check the data
 
         Returns:
             bool: True if it exists else False
@@ -156,7 +163,7 @@ class DownloadBridges:
         log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
         bridge_lst = self.getBridges()
         with open("bridges.json", "w") as f:
-            json.dump(bridge_lst, f)
+            dump(bridge_lst, f)
 
     def readBridges(self):
         """
@@ -164,9 +171,9 @@ class DownloadBridges:
         """
         log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
         with open("bridges.json", "r") as f:
-            my_list = json.load(f)
+            my_list = load(f)
         return my_list
 
-# accecp any number of arguments
+    # accecp any number of arguments
     def red(self, *args):
         return f"\033[91m {args}\033[00m"
