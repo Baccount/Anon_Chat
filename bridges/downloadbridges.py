@@ -1,7 +1,7 @@
-import base64
-import io
-import json
-import os
+from base64 import b64decode
+from io import BytesIO
+from json import dump, load
+from os import path
 import requests
 from PIL import Image
 from logging_msg import log_msg
@@ -21,7 +21,7 @@ class DownloadBridges:
         self.display_image()
 
     def connectMeek(self):
-        self.meek_path = os.path.join(os.path.dirname(__file__), "meek-client")
+        self.meek_path = path.join(path.dirname(__file__), "meek-client")
         log_msg("DownloadBridges", "__init__", "Meek path: " + self.meek_path)
 
         self.meek = Meek(self.meek_path)
@@ -63,8 +63,8 @@ class DownloadBridges:
     def display_image(self):
         try:
             base64_image_data = self.image
-            image_data = base64.b64decode(base64_image_data)
-            image = Image.open(io.BytesIO(image_data))
+            image_data = b64decode(base64_image_data)
+            image = Image.open(BytesIO(image_data))
             image.show()
         except Exception as e:
             log_msg("DownloadBridges", "display_image", f"Error: {e}")
@@ -156,7 +156,7 @@ class DownloadBridges:
         log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
         bridge_lst = self.getBridges()
         with open("bridges.json", "w") as f:
-            json.dump(bridge_lst, f)
+            dump(bridge_lst, f)
 
     def readBridges(self):
         """
@@ -164,7 +164,7 @@ class DownloadBridges:
         """
         log_msg("DownloadBridges", "readBridges", "Reading bridges from bridges.json")
         with open("bridges.json", "r") as f:
-            my_list = json.load(f)
+            my_list = load(f)
         return my_list
 
 # accecp any number of arguments
