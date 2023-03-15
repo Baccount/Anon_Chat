@@ -1,4 +1,5 @@
 import argparse
+from json import dump
 from os import getcwd, path
 
 from colorama import Fore, Style
@@ -8,7 +9,6 @@ from bridges.downloadbridges import DownloadBridges
 from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
-from json import dump
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -85,13 +85,16 @@ class StartServer:
             # we are not testing
             # ask if we want to use bridges or if they want to use their own
             choice = input(
-                "1. Get Bridges online \n2. Use your own bridges\n:"
+                "1. Get Bridges online \n2. Use your own bridges\n3. Default Tor Connection\n:"
             )
 
             if choice == "1":
                 self.use_bridges()
             elif choice == "2":
                 self.use_own_bridges()
+            else:
+                # use default tor config
+                pass
             # if the user enters something else use default tor config
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
@@ -101,8 +104,6 @@ class StartServer:
         self.saveBridges(bridge_lst=bridges)
         self.use_bridges()
 
-
-
     def saveBridges(self, bridge_lst):
         """
         Save the bridges to a file
@@ -111,28 +112,6 @@ class StartServer:
         # write the bridges from the file
         with open("bridges.json", "w") as f:
             dump(bridge_lst, f)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
