@@ -1,5 +1,6 @@
 import argparse
 from os import getcwd, path
+from json import dump
 
 from colorama import Fore, Style
 from stem.process import launch_tor_with_config
@@ -52,10 +53,7 @@ class ClientServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if self.test is False and test_enabled is False:
-            choice = input("Use bridges? (y/n) ")
-            if choice == "y" or choice == "Y":
-                self.use_bridges()
+        self.choose_bridges()
 
     def start(self):
         # start Tor with the new configuration if tor is not running
@@ -77,6 +75,39 @@ class ClientServer:
             # start the client if not testing
             client = Client()
             client.start()
+
+    def choose_bridges(self):
+        if self.test is False and test_enabled is False:
+            # we are not testing
+            # ask if we want to use bridges or if they want to use their own
+            choice = input(
+                "1. Get Bridges online \n2. Use your own bridges\n3. Default Tor Connection\n:"
+            )
+
+            if choice == "1":
+                self.use_bridges()
+            elif choice == "2":
+                self.use_own_bridges()
+            else:
+                # use default tor config
+                pass
+            # if the user enters something else use default tor config
+            log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
+            log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+
+    def use_own_bridges(self):
+        bridges = input("Enter your bridges: ")
+        self.saveBridges(bridge_lst=bridges)
+        self.use_bridges()
+
+    def saveBridges(self, bridge_lst):
+        """
+        Save the bridges to a file
+        """
+        log_msg("StartServer", "saveBridges", "Saving bridges to bridges.json")
+        # write the bridges from the file
+        with open("bridges.json", "w") as f:
+            dump(bridge_lst, f)
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
@@ -115,6 +146,7 @@ class ClientServer:
             "UseBridges": "1",
             "Bridge": obsf4Bridges,
         }
+        log_msg("StartServer", "use_bridges", f"{self.tor_cfg['Bridge']}")
 
     def show_ascii(self):
         print(
