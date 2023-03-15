@@ -1,5 +1,5 @@
 from json import dump
-from logging_msgs import log_msg
+from logging_msg import log_msg
 
 
 
