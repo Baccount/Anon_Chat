@@ -2,18 +2,19 @@ from base64 import b64decode
 from io import BytesIO
 from json import dump, load
 from os import path
+
 import requests
 from PIL import Image
-from logging_msg import log_msg
-from .meek import Meek
 
+from logging_msg import log_msg
+
+from .meek import Meek
 
 
 class DownloadBridges:
     def __init__(self, protocol=None, test=False):
         self.protocol = protocol
         self.test = test
-
 
     def startBridges(self):
         self.connectMeek()
@@ -52,7 +53,9 @@ class DownloadBridges:
             self.transport = moat_res["data"][0]["transport"]
             self.image = moat_res["data"][0]["image"]
             self.challenge = moat_res["data"][0]["challenge"]
-            log_msg("DownloadBridges", "getCaptcha", f"Moat Challenge: {self.challenge}")
+            log_msg(
+                "DownloadBridges", "getCaptcha", f"Moat Challenge: {self.challenge}"
+            )
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
@@ -98,16 +101,20 @@ class DownloadBridges:
                 },
             )
             if self.bridge.status_code != 200:
-                log_msg(self.red("DownloadBridges"), self.red("checkCaptcha", "Server Error: " + str(self.bridge.status_code)))
+                log_msg(
+                    self.red("DownloadBridges"),
+                    self.red(
+                        "checkCaptcha", "Server Error: " + str(self.bridge.status_code)
+                    ),
+                )
                 return False
         except Exception as e:
             log_msg("DownloadBridges", "checkCaptcha", "Error: " + str(e))
             return False
         return self.checkData()
 
-
     def checkData(self, data=None):
-        """ Check the data
+        """Check the data
 
         Returns:
             bool: True if it exists else False
@@ -167,6 +174,6 @@ class DownloadBridges:
             my_list = load(f)
         return my_list
 
-# accecp any number of arguments
+    # accecp any number of arguments
     def red(self, *args):
         return f"\033[91m {args}\033[00m"

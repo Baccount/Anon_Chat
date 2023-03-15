@@ -1,6 +1,6 @@
 import argparse
-from os import getcwd, path
 from json import dump
+from os import getcwd, path
 
 from colorama import Fore, Style
 from stem.process import launch_tor_with_config
