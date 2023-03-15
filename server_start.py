@@ -1,14 +1,13 @@
 import argparse
 from os import getcwd, path
 
-from colorama import Fore, Style
 from stem.process import launch_tor_with_config
 
 from bridges.downloadbridges import DownloadBridges
 from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
-from scrips.scripts import saveBridges
+from scrips.scripts import saveBridges, print_bootstrap_lines
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -63,7 +62,7 @@ class StartServer:
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
                 timeout=250,  # Increase timeout, bridges take a while to connect
-                init_msg_handler=self.print_bootstrap_lines,
+                init_msg_handler=print_bootstrap_lines,
             )
         except Exception as e:
             log_msg("StartServer", "start", "Tor is already running")
@@ -104,12 +103,6 @@ class StartServer:
         bridges = input("Enter your bridges: ")
         saveBridges(bridge_lst=bridges)
         self.use_bridges()
-
-    def print_bootstrap_lines(self, line):
-        if "Bootstrapped " in line:
-            # print the line and clear it
-            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
-            print(final_msg, end="\r")
 
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
