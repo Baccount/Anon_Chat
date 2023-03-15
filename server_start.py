@@ -51,7 +51,7 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        self.add_bridges()
+        self.choose_bridges()
 
     def start(self):
         # start Tor with the new configuration if tor is not running
@@ -79,7 +79,7 @@ class StartServer:
             # we are testing
             return True
 
-    def add_bridges(self):
+    def choose_bridges(self):
         if self.test is False and test_enabled is False:
             # we are not testing
             # ask if we want to use bridges or if they want to use their own
