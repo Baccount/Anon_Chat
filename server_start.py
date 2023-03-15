@@ -53,7 +53,6 @@ class StartServer:
         }
         self.add_bridges()
 
-
     def start(self):
         # start Tor with the new configuration if tor is not running
         log_msg("StartServer", "start", f"starting tor bin {tor_dir}")
@@ -83,34 +82,18 @@ class StartServer:
     def add_bridges(self):
         if self.test is False and test_enabled is False:
             # we are not testing
-            choice = input("Use bridges? (y/n) ")
-            if choice == "y" or choice == "Y":
+            # ask if we want to use bridges or if they want to use their own
+            choice = input(
+                "1. Get Bridges online \n2. Use your own bridges\n:"
+            )
+
+            if choice == "1":
                 self.use_bridges()
-            # TODO improve logic
+            elif choice == "2":
+                self.use_own_bridges()
+            # if the user enters something else use default tor config
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
