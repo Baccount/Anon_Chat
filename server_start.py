@@ -1,5 +1,4 @@
 import argparse
-from json import dump
 from os import getcwd, path
 
 from colorama import Fore, Style
@@ -9,6 +8,7 @@ from bridges.downloadbridges import DownloadBridges
 from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
+from scrips.scripts import saveBridges
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -102,17 +102,8 @@ class StartServer:
     def use_own_bridges(self):
         print("Get bridges from https://bridges.torproject.org/bridges/?transport=obfs4")
         bridges = input("Enter your bridges: ")
-        self.saveBridges(bridge_lst=bridges)
+        saveBridges(bridge_lst=bridges)
         self.use_bridges()
-
-    def saveBridges(self, bridge_lst):
-        """
-        Save the bridges to a file
-        """
-        log_msg("StartServer", "saveBridges", "Saving bridges to bridges.json")
-        # write the bridges from the file
-        with open("bridges.json", "w") as f:
-            dump(bridge_lst, f)
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
