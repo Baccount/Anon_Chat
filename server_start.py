@@ -51,14 +51,8 @@ class StartServer:
             "GeoIPFile": f"{geo_ip_file}",
             "GeoIPv6File": f"{geo_ipv6_file}",
         }
-        if self.test is False and test_enabled is False:
-            # we are not testing
-            choice = input("Use bridges? (y/n) ")
-            if choice == "y" or choice == "Y":
-                self.use_bridges()
-            # TODO improve logic
-            log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
-            log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+        self.add_bridges()
+
 
     def start(self):
         # start Tor with the new configuration if tor is not running
@@ -85,6 +79,38 @@ class StartServer:
         if self.test:
             # we are testing
             return True
+
+    def add_bridges(self):
+        if self.test is False and test_enabled is False:
+            # we are not testing
+            choice = input("Use bridges? (y/n) ")
+            if choice == "y" or choice == "Y":
+                self.use_bridges()
+            # TODO improve logic
+            log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
+            log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
