@@ -8,6 +8,7 @@ from bridges.downloadbridges import DownloadBridges
 from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
+from json import dump
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -94,6 +95,44 @@ class StartServer:
             # if the user enters something else use default tor config
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+
+    def use_own_bridges(self):
+        bridges = input("Enter your bridges: ")
+        self.saveBridges(bridge_lst=bridges)
+        self.use_bridges()
+
+
+
+    def saveBridges(self, bridge_lst):
+        """
+        Save the bridges to a file
+        """
+        log_msg("StartServer", "saveBridges", "Saving bridges to bridges.json")
+        # write the bridges from the file
+        with open("bridges.json", "w") as f:
+            dump(bridge_lst, f)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def print_bootstrap_lines(self, line):
         if "Bootstrapped " in line:
