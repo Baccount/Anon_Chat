@@ -7,7 +7,7 @@ from bridges.downloadbridges import DownloadBridges
 from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
-from scrips.scripts import saveBridges, print_bootstrap_lines
+from scrips.scripts import saveBridges, print_bootstrap_lines, server_ascii
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -40,7 +40,7 @@ geo_ipv6_file = getcwd() + "/tor/geoip6"
 
 class StartServer:
     def __init__(self, test=False):
-        self.show_ascii()
+        server_ascii()
         self.test = test
         self.tor_cfg = {
             "SocksPort": "9050",
@@ -138,7 +138,7 @@ class StartServer:
         }
         log_msg("StartServer", "use_bridges", f"{self.tor_cfg['Bridge']}")
 
-    def show_ascii(self):
+    def server_ascii():
         print(
             """
                d8888                             .d8888b.  888               888          .d8888b.                                             
