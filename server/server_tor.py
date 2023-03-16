@@ -1,9 +1,9 @@
-import socket
+from socket import socket
 from stem.control import Controller
 from logging_msg import log_msg
 from stem import ProtocolError
 from scrips.scripts import force_kill_tor
-import os
+from os import path
 
 
 class BundledTorCanceled(Exception):
@@ -17,7 +17,7 @@ class CreateOnion():
 
     def __init__(self):
         try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket(socket.AF_INET, socket.SOCK_STREAM)
             # get available port
             self.port = self.get_available_port()
             self.controller = Controller.from_port(port=9051)
@@ -30,7 +30,7 @@ class CreateOnion():
             exit(1)
 
     def get_available_port(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(('localhost', 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             log_msg("CreateOnion", "get_available_port", f" Port: {s.getsockname()[1]}")
@@ -57,9 +57,9 @@ class CreateOnion():
         '''
         # set key path as the current directory
         try:
-            key_path = os.path.join(os.path.dirname(__file__), 'private_key')
+            key_path = path.join(path.dirname(__file__), 'private_key')
             log_msg("non_ephemeral_onion", "Creating non-ephemeral hidden service on port 80")
-            if not os.path.exists(key_path):
+            if not path.exists(key_path):
                 response = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
                 with open(key_path, 'w') as key_file:
                     key_file.write('%s:%s' % (response.private_key_type, response.private_key))
