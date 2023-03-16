@@ -98,9 +98,10 @@ class StartServer:
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
 
     def use_own_bridges(self):
-        print("Get bridges from https://bridges.torproject.org/bridges/?transport=obfs4")
-        bridges = input("Enter your bridges: ")
-        saveBridges(bridge_lst=bridges)
+        if not path.exists("bridges.json"):
+            print("Get bridges from https://bridges.torproject.org/bridges/?transport=obfs4")
+            bridges = input("Enter your bridges: ")
+            saveBridges(bridge_lst=bridges)
         self.use_bridges()
 
     def use_bridges(self):
