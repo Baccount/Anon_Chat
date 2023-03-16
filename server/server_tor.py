@@ -2,7 +2,7 @@ import socket
 from stem.control import Controller
 from logging_msg import log_msg
 from stem import ProtocolError
-from kill_tor import force_kill_tor
+from scrips.scripts import force_kill_tor
 import os
 
 

@@ -9,7 +9,7 @@ from client_start import ClientServer
 # trunk-ignore(flake8/E402)
 from client.client import Client
 # trunk-ignore(flake8/E402)
-from kill_tor import force_kill_tor
+from scrips.scripts import force_kill_tor
 
 class TestClient:
     def setup(self):

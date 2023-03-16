@@ -1,6 +1,7 @@
 from json import dump
 from logging_msg import log_msg
 from colorama import Fore, Style
+from subprocess import Popen, PIPE, run
 
 
 
@@ -47,3 +48,25 @@ def server_ascii():
     d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888       "Y8888P"   "Y8888  888       Y88P    "Y8888  888     
         """
     )
+
+def force_kill_tor():
+    """
+    Force kill the tor process
+    """
+    try:
+        log_msg("force_kill_tor", "Killing tor subprocess")
+        # Find the process IDs (PIDs) of the processes with the given name
+        pid_command = ["pgrep", "-x", "tor"]
+        pid_process = Popen(pid_command, stdout=PIPE)
+        pid_output, _ = pid_process.communicate()
+        pids = pid_output.decode().strip().split("\n")
+        # Kill each process with the found PIDs
+        if pids:
+            for pid in pids:
+                kill_command = ["kill", pid]
+                run(kill_command)
+                print(f"Process tor (PID {pid}) killed.")
+        else:
+            print("No process named tor found.")
+    except Exception as e:
+        print(e)

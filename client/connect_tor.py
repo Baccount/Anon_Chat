@@ -1,8 +1,7 @@
 import socket
 
 import socks
-
-from kill_tor import force_kill_tor
+from scrips.scripts import force_kill_tor
 from logging_msg import log_msg
 
 
