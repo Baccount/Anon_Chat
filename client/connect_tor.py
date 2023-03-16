@@ -31,7 +31,7 @@ class ConnectTor(object):
         except Exception as e:
             log_msg("connect_tor", "connect_onion", f"Error: {e}")
             # reset the socket
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket(AF_INET, SOCK_STREAM)
             log_msg("connect_tor", "connect_onion", "Reseting socket")
             return False
         if self.test:
