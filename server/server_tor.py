@@ -1,4 +1,4 @@
-from socket import socket
+from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from stem.control import Controller
 from logging_msg import log_msg
 from stem import ProtocolError
@@ -17,7 +17,7 @@ class CreateOnion():
 
     def __init__(self):
         try:
-            self.socket = socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket(AF_INET, SOCK_STREAM)
             # get available port
             self.port = self.get_available_port()
             self.controller = Controller.from_port(port=9051)
@@ -30,9 +30,9 @@ class CreateOnion():
             exit(1)
 
     def get_available_port(self):
-        with socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket(AF_INET, SOCK_STREAM) as s:
             s.bind(('localhost', 0))
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
             log_msg("CreateOnion", "get_available_port", f" Port: {s.getsockname()[1]}")
             return s.getsockname()[1]
 
