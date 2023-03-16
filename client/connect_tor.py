@@ -1,8 +1,7 @@
-import socket
+from socket import socket, AF_INET, SOCK_STREAM
 
-import socks
-
-from kill_tor import force_kill_tor
+from socks import setdefaultproxy, PROXY_TYPE_SOCKS5, socksocket
+from scrips.scripts import force_kill_tor
 from logging_msg import log_msg
 
 
@@ -10,9 +9,9 @@ class ConnectTor(object):
     def __init__(self, test=False):
         self.test = test
         try:
-            socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
-            socket.socket = socks.socksocket
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
+            socket = socksocket
+            self.socket = socket(AF_INET, SOCK_STREAM)
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
             force_kill_tor()
@@ -32,7 +31,7 @@ class ConnectTor(object):
         except Exception as e:
             log_msg("connect_tor", "connect_onion", f"Error: {e}")
             # reset the socket
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket(AF_INET, SOCK_STREAM)
             log_msg("connect_tor", "connect_onion", "Reseting socket")
             return False
         if self.test:

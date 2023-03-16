@@ -1,14 +1,12 @@
 import argparse
-from json import dump
 from os import getcwd, path
 
-from colorama import Fore, Style
 from stem.process import launch_tor_with_config
 
 from bridges.downloadbridges import DownloadBridges
-from kill_tor import force_kill_tor
 from logging_msg import log_msg
 from server.server import Server
+from scrips.scripts import saveBridges, print_bootstrap_lines, server_ascii, force_kill_tor
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
@@ -41,7 +39,7 @@ geo_ipv6_file = getcwd() + "/tor/geoip6"
 
 class StartServer:
     def __init__(self, test=False):
-        self.show_ascii()
+        server_ascii()
         self.test = test
         self.tor_cfg = {
             "SocksPort": "9050",
@@ -63,7 +61,7 @@ class StartServer:
                 config=self.tor_cfg,
                 tor_cmd=tor_dir,  # path to your tor binary
                 timeout=250,  # Increase timeout, bridges take a while to connect
-                init_msg_handler=self.print_bootstrap_lines,
+                init_msg_handler=print_bootstrap_lines,
             )
         except Exception as e:
             log_msg("StartServer", "start", "Tor is already running")
@@ -100,25 +98,11 @@ class StartServer:
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
 
     def use_own_bridges(self):
-        print("Get bridges from https://bridges.torproject.org/bridges/?transport=obfs4")
-        bridges = input("Enter your bridges: ")
-        self.saveBridges(bridge_lst=bridges)
+        if not path.exists("bridges.json"):
+            print("Get bridges from https://bridges.torproject.org/bridges/?transport=obfs4")
+            bridges = input("Enter your bridges: ")
+            saveBridges(bridge_lst=bridges)
         self.use_bridges()
-
-    def saveBridges(self, bridge_lst):
-        """
-        Save the bridges to a file
-        """
-        log_msg("StartServer", "saveBridges", "Saving bridges to bridges.json")
-        # write the bridges from the file
-        with open("bridges.json", "w") as f:
-            dump(bridge_lst, f)
-
-    def print_bootstrap_lines(self, line):
-        if "Bootstrapped " in line:
-            # print the line and clear it
-            final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
-            print(final_msg, end="\r")
 
     def use_bridges(self):
         # If bridges.json does not exist, download bridges
@@ -153,20 +137,6 @@ class StartServer:
             "Bridge": obsf4Bridges,
         }
         log_msg("StartServer", "use_bridges", f"{self.tor_cfg['Bridge']}")
-
-    def show_ascii(self):
-        print(
-            """
-               d8888                             .d8888b.  888               888          .d8888b.                                             
-              d88888                            d88P  Y88b 888               888         d88P  Y88b                                            
-             d88P888                            888    888 888               888         Y88b.                                                 
-            d88P 888 88888b.   .d88b.  88888b.  888        88888b.   8888b.  888888       "Y888b.    .d88b.  888d888 888  888  .d88b.  888d888 
-           d88P  888 888 "88b d88""88b 888 "88b 888        888 "88b     "88b 888             "Y88b. d8P  Y8b 888P"   888  888 d8P  Y8b 888P"   
-          d88P   888 888  888 888  888 888  888 888    888 888  888 .d888888 888               "888 88888888 888     Y88  88P 88888888 888     
-         d8888888888 888  888 Y88..88P 888  888 Y88b  d88P 888  888 888  888 Y88b.       Y88b  d88P Y8b.     888      Y8bd8P  Y8b.     888     
-        d88P     888 888  888  "Y88P"  888  888  "Y8888P"  888  888 "Y888888  "Y888       "Y8888P"   "Y8888  888       Y88P    "Y8888  888     
-            """
-        )
 
 
 if __name__ == "__main__":
