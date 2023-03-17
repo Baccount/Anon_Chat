@@ -9,7 +9,7 @@ from client_start import ClientServer
 # trunk-ignore(flake8/E402)
 from client.client import Client
 # trunk-ignore(flake8/E402)
-from scrips.scripts import force_kill_tor
+from scrips.scripts import force_kill_tor, decode
 
 class TestClient:
     def setup(self):
@@ -30,7 +30,7 @@ class TestClient:
     def test_decode(self):
         # test decode function
         buffer = '{"sender_id": "1", "sender_nickname": "test", "message": "test"} {"sender_id": "1", "sender_nickname": "test", "message": "test"}'
-        assert self.client.decode(buffer) == ['{"sender_id": "1", "sender_nickname": "test", "message": "test"}', '{"sender_id": "1", "sender_nickname": "test", "message": "test"}']
+        assert decode(buffer) == ['{"sender_id": "1", "sender_nickname": "test", "message": "test"}', '{"sender_id": "1", "sender_nickname": "test", "message": "test"}']
 
     def test_kill_tor(self):
         # start tor
