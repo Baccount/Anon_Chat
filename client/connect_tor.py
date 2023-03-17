@@ -1,4 +1,4 @@
-from socket import socket, AF_INET, SOCK_STREAM
+from socket import AF_INET, SOCK_STREAM
 
 from socks import setdefaultproxy, PROXY_TYPE_SOCKS5, socksocket
 from scrips.scripts import force_kill_tor
@@ -10,6 +10,7 @@ class ConnectTor(object):
         self.test = test
         try:
             setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
+            # trunk-ignore(flake8/F811)
             socket = socksocket
             self.socket = socket(AF_INET, SOCK_STREAM)
         except Exception as e:
@@ -31,6 +32,9 @@ class ConnectTor(object):
         except Exception as e:
             log_msg("connect_tor", "connect_onion", f"Error: {e}")
             # reset the socket
+            setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
+            # trunk-ignore(flake8/F811)
+            socket = socksocket
             self.socket = socket(AF_INET, SOCK_STREAM)
             log_msg("connect_tor", "connect_onion", "Reseting socket")
             return False
