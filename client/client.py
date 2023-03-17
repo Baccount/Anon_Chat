@@ -3,9 +3,9 @@ import threading
 from cmd import Cmd
 
 from logging_msg import log_msg
+from scrips.scripts import decode
 
 from .connect_tor import ConnectTor
-from scrips.scripts import decode
 
 
 class Client(Cmd):
@@ -38,7 +38,7 @@ class Client(Cmd):
                 decoded = decode(buffer)
                 if not decoded or decoded == "":
                     # We lost connection restart the client
-                    log_msg("__receive_message_thread_Error1", "Message not decoded", buffer)
+                    log_msg("__receive_message_thread", "Message not decoded", buffer)
                     self.tor.socket.close()
                     self.start()
 
