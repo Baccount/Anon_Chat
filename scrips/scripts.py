@@ -70,3 +70,28 @@ def force_kill_tor():
             print("No process named tor found.")
     except Exception as e:
         print(e)
+
+def decode(buffer):
+    """
+    Decode the buffer into individual JSON objects.
+
+    :param buffer: The buffer to be decoded.
+    :return: A list of JSON objects.
+    """
+    objects = []
+    start = 0
+    end = buffer.find("{", start)
+    while end != -1:
+        start = end
+        count = 1
+        end = start + 1
+        while count > 0 and end < len(buffer):
+            if buffer[end] == "{":
+                count += 1
+            elif buffer[end] == "}":
+                count -= 1
+            end += 1
+        objects.append(buffer[start:end])
+        start = end
+        end = buffer.find("{", start)
+    return objects

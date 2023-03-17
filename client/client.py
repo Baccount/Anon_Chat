@@ -5,6 +5,7 @@ from cmd import Cmd
 from logging_msg import log_msg
 
 from .connect_tor import ConnectTor
+from scrips.scripts import decode
 
 
 class Client(Cmd):
@@ -34,7 +35,7 @@ class Client(Cmd):
         while self.__isLogin:
             try:
                 buffer = self.tor.socket.recv(1024).decode()
-                decoded = self.decode(buffer)
+                decoded = decode(buffer)
                 if not decoded:
                     log_msg("__receive_message_thread", "Message not decoded", buffer)
                     exit()
@@ -46,31 +47,6 @@ class Client(Cmd):
                 log_msg("__receive_message_thread", "Exception ", e)
                 self.__isLogin = False
                 break
-
-    def decode(self, buffer):
-        """
-        Decode the buffer into individual JSON objects.
-
-        :param buffer: The buffer to be decoded.
-        :return: A list of JSON objects.
-        """
-        objects = []
-        start = 0
-        end = buffer.find("{", start)
-        while end != -1:
-            start = end
-            count = 1
-            end = start + 1
-            while count > 0 and end < len(buffer):
-                if buffer[end] == "{":
-                    count += 1
-                elif buffer[end] == "}":
-                    count -= 1
-                end += 1
-            objects.append(buffer[start:end])
-            start = end
-            end = buffer.find("{", start)
-        return objects
 
     def __send_message_thread(self, message):
         """
