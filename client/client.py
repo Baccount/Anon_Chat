@@ -104,10 +104,17 @@ class Client(Cmd):
                 print(buffer)
                 obj = json.loads(buffer)
                 if obj["id"]:
+                    
                     # if id = -1 means the nickname is already in use
                     if obj["id"] == -1:
                         print("[Client] The nickname is already in use")
                         log_msg("do_login", "The nickname is already in use")
+                        return
+                    
+                    # if id = -2 means the nickname is disallowed/banned
+                    if obj["id"] == -2:
+                        print("[Client] The nickname is disallowed/banned")
+                        log_msg("do_login", "The nickname is disallowed/banned")
                         return
                     self.__nickname = nickname
                     self.__id = obj["id"]

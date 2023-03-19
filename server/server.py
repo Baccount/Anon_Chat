@@ -200,11 +200,13 @@ class Server(Cmd):
                     
                     # check if the nickname is disallowed/banned
                     if obj["nickname"].lower() in disallowed:
+                        log_msg("__waitForLogin", f"Nickname {obj['nickname']} is Disallowed/Banned")
                         connection.send(json.dumps({"id": -2}).encode())
                         continue
                     
                     # check if the nickname is already in use
                     if obj["nickname"] in self.__nicknames:
+                        log_msg("__waitForLogin", f"Nickname {obj['nickname']} is already in use by another user")
                         connection.send(json.dumps({"id": -1}).encode())
                         continue
                     
