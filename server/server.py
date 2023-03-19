@@ -197,13 +197,21 @@ class Server(Cmd):
                 log_msg("__waitForLogin", f"buffer: {buffer}")
                 obj = json.loads(buffer)
                 if obj["type"] == "login":
+                    
+                    # check if the nickname is disallowed/banned
+                    if obj["nickname"].lower() in disallowed:
+                        connection.send(json.dumps({"id": -2}).encode())
+                        continue
+                    
                     # check if the nickname is already in use
-                    if obj["nickname"] in self.__nicknames or obj["nickname"] in disallowed:
+                    if obj["nickname"] in self.__nicknames:
                         connection.send(json.dumps({"id": -1}).encode())
                         continue
+                    
                     # add the connection and nickname to the lists
                     self.__connections.append(connection)
                     self.__nicknames.append(obj["nickname"])
+
                     connection.send(
                         json.dumps({"id": len(self.__connections) - 1}).encode()
                     )
