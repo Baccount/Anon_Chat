@@ -190,6 +190,7 @@ class Server(Cmd):
 
         :param connection: The connection with the client.
         """
+        disallowed = ["Server", "server", "SERVER", "admin", "Admin", "ADMIN", "root", "Root", "ROOT", "administrator", "Administrator", "ADMINISTRATOR", "", " "]
         while True:
             try:
                 buffer = connection.recv(1024).decode()
@@ -197,7 +198,7 @@ class Server(Cmd):
                 obj = json.loads(buffer)
                 if obj["type"] == "login":
                     # check if the nickname is already in use
-                    if obj["nickname"] in self.__nicknames:
+                    if obj["nickname"] in self.__nicknames or obj["nickname"] in disallowed:
                         connection.send(json.dumps({"id": -1}).encode())
                         continue
                     # add the connection and nickname to the lists
