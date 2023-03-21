@@ -250,6 +250,7 @@ class Server(Cmd):
             print("1. Ephemeral")
             print("2. Non-ephemeral")
             print("3. Delete private key")
+            print("4. Run server (ephemeral)")
             choice = input("Enter choice: ")
             if choice == "1":
                 response = self.tor.ephemeral_onion()
@@ -258,6 +259,8 @@ class Server(Cmd):
             elif choice == "3":
                 self.delete_private_key()
                 self.start()
+            elif choice == "4":
+                self.tor.run_server()
             else:
                 print("Invalid choice")
                 self.start()
@@ -268,6 +271,7 @@ class Server(Cmd):
         print("[Server] server is running......")
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
         self.onion_address = response.service_id
+
 
         self.__connections.append(None)
         self.__nicknames.append("\033[92m" + "Server" + "\033[0m")
