@@ -250,6 +250,7 @@ class Server(Cmd):
             print("1. Ephemeral")
             print("2. Non-ephemeral")
             print("3. Delete private key")
+            print("4. Ephemeral with authentication")
             choice = input("Enter choice: ")
             if choice == "1":
                 response = self.tor.ephemeral_onion()
@@ -258,6 +259,9 @@ class Server(Cmd):
             elif choice == "3":
                 self.delete_private_key()
                 self.start()
+            elif choice == "4":
+                response = self.tor.ephemeral_onion_auth()
+                print(response.auth_cookie)
             else:
                 print("Invalid choice")
                 self.start()

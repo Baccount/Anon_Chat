@@ -4,6 +4,7 @@ from logging_msg import log_msg
 from stem import ProtocolError
 from scrips.scripts import force_kill_tor
 from os import path
+from base64 import b32encode
 
 
 class BundledTorCanceled(Exception):
@@ -49,6 +50,41 @@ class CreateOnion():
             force_kill_tor()
             # call the function again
             self.ephemeral_onion()
+
+
+
+
+    def ephemeral_onion_auth(self):
+        '''
+        create ephemeral hidden services with V3 Auth
+        '''
+        try:
+            # generate auth key base32-encoded public key from a key pair you
+            # have generated elsewhere.
+            public_key, private_key = self.generate_key_pair()
+            log_msg("ephemeral_onion_auth", "Creating ephemeral hidden service with Auth on port 80")
+            return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True, client_auth_v3=public_key)
+        except ProtocolError as e:
+            # kill tor subprocess
+            log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
+            force_kill_tor()
+            # call the function again
+            self.ephemeral_onion_auth()
+
+
+    def key_str(self, key):
+        """
+        Returns a base32 decoded string of a key.
+        """
+        # bytes to base 32
+        key_bytes = bytes(key)
+        key_b32 = b32encode(key_bytes)
+        # strip trailing ====
+        assert key_b32[-4:] == b"===="
+        key_b32 = key_b32[:-4]
+        # change from b'ASDF' to ASDF
+        s = key_b32.decode("utf-8")
+        return s
 
 
     def non_ephemeral_onion(self):
