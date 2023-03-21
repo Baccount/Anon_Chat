@@ -17,7 +17,7 @@ AnonChat is a secure, anonymous, and terminal-based chatroom application that op
 
 ## Getting Started
 
-AnonChat can be installed and run on most operating systems, including macOS, Linux and Windows. To get started with AnonChat, simply follow these steps:
+AnonChat can be installed on macOS "porting to other operating systems will be done in the future." To get started with AnonChat, simply follow these steps:
 
 1.  Install the Tor on your computer.
 2.  Clone this repository to your local machine using the following command:
