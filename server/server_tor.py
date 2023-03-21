@@ -5,6 +5,7 @@ from stem import ProtocolError
 from scrips.scripts import force_kill_tor
 from os import path
 from base64 import b32encode
+from nacl import public
 
 
 class BundledTorCanceled(Exception):
@@ -25,6 +26,7 @@ class CreateOnion():
             self.controller.authenticate()
             self.socket.bind(("127.0.0.1", self.port))
             self.socket.listen(10)
+            self.client_auth_priv_key = None
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
             force_kill_tor()
@@ -61,9 +63,13 @@ class CreateOnion():
         try:
             # generate auth key base32-encoded public key from a key pair you
             # have generated elsewhere.
-            public_key, private_key = self.generate_key_pair()
+            client_auth_priv_key_raw = public.PrivateKey.generate()
+            self.client_auth_priv_key = self.key_str(client_auth_priv_key_raw)
+            client_auth_pub_key = self.key_str(
+                        client_auth_priv_key_raw.public_key
+                    )
             log_msg("ephemeral_onion_auth", "Creating ephemeral hidden service with Auth on port 80")
-            return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True, client_auth_v3=public_key)
+            return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True, client_auth_v3=client_auth_pub_key)
         except ProtocolError as e:
             # kill tor subprocess
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")

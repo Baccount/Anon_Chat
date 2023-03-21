@@ -28,6 +28,8 @@ class Server(Cmd):
         self.__lock = threading.Lock()
         self.onion_address = None
         self.test_enabled = test_enabled
+        # keep track of hidden service auth private key
+        self.client_auth_priv_key = None
 
     def disconnectUsr(self, user_id, nickname="NONE"):
         """
@@ -261,7 +263,7 @@ class Server(Cmd):
                 self.start()
             elif choice == "4":
                 response = self.tor.ephemeral_onion_auth()
-                print(response.auth_cookie)
+                self.client_auth_priv_key = self.tor.client_auth_priv_key
             else:
                 print("Invalid choice")
                 self.start()
@@ -270,6 +272,7 @@ class Server(Cmd):
             response = self.tor.ephemeral_onion()
 
         print("[Server] server is running......")
+        print(f"Private key: {self.g(self.client_auth_priv_key)}")
         print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
         self.onion_address = response.service_id
 
