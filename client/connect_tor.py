@@ -25,6 +25,8 @@ class ConnectTor(object):
         Return: True if connected to the onion address else False
         """
         try:
+            # connect to the onion address with auth string
+            self.server = (onion, 80)
             log_msg("connect_tor", "connect_onion", f"connecting to {onion}")
             self.server = (onion, 80)
             self.socket.connect(self.server)
