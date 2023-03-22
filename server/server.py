@@ -243,7 +243,9 @@ class Server(Cmd):
         if os.path.exists(key_path):
             os.remove(key_path)
             print("Private key deleted")
-            log_msg("delete_private_key", f"Deleted {key_path}")
+            log_msg("Server", "delete_private_key", f"Deleted {key_path}")
+        else:
+            log_msg("Server", "delete_private_key", "File does not exist")
 
     def start(self):
         """
