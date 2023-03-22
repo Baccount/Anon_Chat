@@ -9,6 +9,7 @@ from PIL import Image
 from logging_msg import log_msg
 
 from .meek import Meek
+from scrips.scripts import r
 
 
 class DownloadBridges:
@@ -102,8 +103,8 @@ class DownloadBridges:
             )
             if self.bridge.status_code != 200:
                 log_msg(
-                    self.red("DownloadBridges"),
-                    self.red(
+                    r("DownloadBridges"),
+                    r(
                         "checkCaptcha", "Server Error: " + str(self.bridge.status_code)
                     ),
                 )
