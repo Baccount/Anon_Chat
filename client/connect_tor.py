@@ -10,7 +10,6 @@ class ConnectTor(object):
         self.test = test
         try:
             setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
-            # trunk-ignore(flake8/F811)
             socket = socksocket
             self.socket = socket(AF_INET, SOCK_STREAM)
         except Exception as e:
@@ -33,7 +32,6 @@ class ConnectTor(object):
             log_msg("connect_tor", "connect_onion", f"Error: {e}")
             # reset the socket
             setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
-            # trunk-ignore(flake8/F811)
             socket = socksocket
             self.socket = socket(AF_INET, SOCK_STREAM)
             log_msg("connect_tor", "connect_onion", "Reseting socket")

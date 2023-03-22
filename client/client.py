@@ -101,7 +101,7 @@ class Client(Cmd):
 
             try:
                 buffer = self.tor.socket.recv(1024).decode()
-                print(buffer)
+                log_msg("Client", "do_login", f"buffer{buffer}")
                 obj = json.loads(buffer)
                 if obj["id"]:
                     
@@ -119,8 +119,8 @@ class Client(Cmd):
                     self.__nickname = nickname
                     self.__id = obj["id"]
                     self.__isLogin = True
-                    print("[Client] Successfully logged into the chat room")
-                    log_msg("do_login", "Successfully logged into the chat room")
+                    print("Successfully logged into the chat room")
+                    log_msg("Client", "do_login", "Successfully logged into the chat room")
 
                     thread = threading.Thread(target=self.__receive_message_thread)
                     thread.setDaemon(True)
