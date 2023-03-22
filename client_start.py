@@ -1,4 +1,4 @@
-import argparse
+from argparse import ArgumentParser
 from os import getcwd, path, remove
 
 
@@ -10,7 +10,7 @@ from logging_msg import log_msg
 from scrips.scripts import saveBridges, print_bootstrap_lines, ascii_client, force_kill_tor
 
 # Create an ArgumentParser object
-parser = argparse.ArgumentParser()
+parser = ArgumentParser()
 
 # Add an argument to specify a boolean value
 parser.add_argument(

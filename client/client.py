@@ -1,5 +1,5 @@
-import json
-import threading
+from json import dumps, loads
+from threading import Thread
 from cmd import Cmd
 
 from logging_msg import log_msg
@@ -43,7 +43,7 @@ class Client(Cmd):
                     self.start()
 
                 for i in decoded:
-                    obj = json.loads(i)
+                    obj = loads(i)
                     print("[" + str(obj["sender_nickname"]) + "]", obj["message"])
             except Exception as e:
                 log_msg("__receive_message_thread", "Exception ", e)
@@ -58,7 +58,7 @@ class Client(Cmd):
         """
         try:
             self.tor.socket.send(
-                json.dumps(
+                dumps(
                     {"type": "broadcast", "sender_id": self.__id, "message": message}
                 ).encode()
             )
@@ -96,13 +96,13 @@ class Client(Cmd):
         if not self.__isLogin:
             # Send the nickname to the server to get the user id
             self.tor.socket.send(
-                json.dumps({"type": "login", "nickname": nickname}).encode()
+                dumps({"type": "login", "nickname": nickname}).encode()
             )
 
             try:
                 buffer = self.tor.socket.recv(1024).decode()
                 log_msg("Client", "do_login", f"buffer{buffer}")
-                obj = json.loads(buffer)
+                obj = loads(buffer)
                 if obj["id"]:
                     
                     # if id = -1 means the nickname is already in use
@@ -122,7 +122,7 @@ class Client(Cmd):
                     print("Successfully logged into the chat room")
                     log_msg("Client", "do_login", "Successfully logged into the chat room")
 
-                    thread = threading.Thread(target=self.__receive_message_thread)
+                    thread = Thread(target=self.__receive_message_thread)
                     thread.setDaemon(True)
                     thread.start()
             except Exception as e:
@@ -145,7 +145,7 @@ class Client(Cmd):
             # Show messages sent by yourself
             print("[" + str(self.__nickname) + "]", message)
             # Open child thread for sending data
-            thread = threading.Thread(
+            thread = Thread(
                 target=self.__send_message_thread, args=(message,)
             )
             thread.setDaemon(True)
@@ -159,7 +159,7 @@ class Client(Cmd):
         Logout from the chat room.
         """
         self.tor.socket.send(
-            json.dumps({"type": "logout", "sender_id": self.__id}).encode()
+            dumps({"type": "logout", "sender_id": self.__id}).encode()
         )
         self.__isLogin = False
         log_msg("do_logout", "You have logged out")

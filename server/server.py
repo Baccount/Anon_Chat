@@ -1,6 +1,6 @@
-import json
-import os
-import threading
+from json import loads, dumps
+from os import path, remove
+from threading import Lock, Thread
 from cmd import Cmd
 
 from logging_msg import log_msg
@@ -26,7 +26,7 @@ class Server(Cmd):
         self.tor = CreateOnion()
         self.__connections = list()
         self.__nicknames = list()
-        self.__lock = threading.Lock()
+        self.__lock = Lock()
         self.onion_address = None
         self.test_enabled = test_enabled
 
@@ -139,7 +139,7 @@ class Server(Cmd):
 
                 for obj in objects:
                     if obj:
-                        obj = json.loads(obj)
+                        obj = loads(obj)
                         self.handle_obj(obj, user_id, nickname)
             except Exception as e:
                 log_msg("__user_thread", f"Error: {e}")
@@ -168,7 +168,7 @@ class Server(Cmd):
             for i in range(len(self.__connections)):
                 if user_id != i and self.__connections[i]:
                     self.__connections[i].send(
-                        json.dumps(
+                        dumps(
                             {
                                 "sender_id": user_id,
                                 "sender_nickname": self.__nicknames[user_id],
@@ -191,19 +191,19 @@ class Server(Cmd):
             try:
                 buffer = connection.recv(1024).decode()
                 log_msg("__waitForLogin", f"buffer: {buffer}")
-                obj = json.loads(buffer)
+                obj = loads(buffer)
                 if obj["type"] == "login":
                     
                     # check if the nickname is disallowed/banned
                     if obj["nickname"].lower() in disallowed:
                         log_msg("__waitForLogin", f"Nickname {obj['nickname']} is Disallowed/Banned")
-                        connection.send(json.dumps({"id": -2}).encode())
+                        connection.send(dumps({"id": -2}).encode())
                         continue
                     
                     # check if the nickname is already in use
                     if obj["nickname"] in self.__nicknames:
                         log_msg("__waitForLogin", f"Nickname {obj['nickname']} is already in use by another user")
-                        connection.send(json.dumps({"id": -1}).encode())
+                        connection.send(dumps({"id": -1}).encode())
                         continue
                     
                     # add the connection and nickname to the lists
@@ -211,10 +211,10 @@ class Server(Cmd):
                     self.__nicknames.append(obj["nickname"])
 
                     connection.send(
-                        json.dumps({"id": len(self.__connections) - 1}).encode()
+                        dumps({"id": len(self.__connections) - 1}).encode()
                     )
                     # start a new thread for the user
-                    thread = threading.Thread(
+                    thread = Thread(
                         target=self.__user_thread, args=(len(self.__connections) - 1,)
                     )
                     thread.setDaemon(True)
@@ -236,9 +236,9 @@ class Server(Cmd):
                     break
 
     def delete_private_key(self):
-        key_path = os.path.join(os.path.dirname(__file__), "private_key")
-        if os.path.exists(key_path):
-            os.remove(key_path)
+        key_path = path.join(path.dirname(__file__), "private_key")
+        if path.exists(key_path):
+            remove(key_path)
             print("Private key deleted")
             log_msg("Server", "delete_private_key", f"Deleted {key_path}")
         else:
@@ -276,7 +276,7 @@ class Server(Cmd):
         self.__connections.append(None)
         self.__nicknames.append("\033[92m" + "Server" + "\033[0m")
 
-        cmdThread = threading.Thread(target=self.cmdloop)
+        cmdThread = Thread(target=self.cmdloop)
         cmdThread.setDaemon(True)
         cmdThread.start()
         while True:
@@ -286,7 +286,7 @@ class Server(Cmd):
                 f"[Server] received a new connection', {connection.getsockname()}, {connection.fileno()}",
             )
 
-            thread = threading.Thread(target=self.__waitForLogin, args=(connection,))
+            thread = Thread(target=self.__waitForLogin, args=(connection,))
             thread.setDaemon(True)
             thread.start()
 

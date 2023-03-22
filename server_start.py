@@ -1,4 +1,4 @@
-import argparse
+from argparse import ArgumentParser
 from os import getcwd, path
 
 from stem.process import launch_tor_with_config
@@ -9,7 +9,7 @@ from server.server import Server
 from scrips.scripts import saveBridges, print_bootstrap_lines, server_ascii, force_kill_tor
 
 # Create an ArgumentParser object
-parser = argparse.ArgumentParser()
+parser = ArgumentParser()
 
 # Add an argument to specify a boolean value
 parser.add_argument(
