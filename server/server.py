@@ -83,8 +83,7 @@ class Server(Cmd):
             objects.append(buffer[start:end])
             start = end
             end = buffer.find("{", start)
-            # Process each JSON object
-            log_msg("separateJson", f"objects: {objects}")
+            #log_msg("separateJson", f"objects: {objects}")
             return objects
 
     def decode_buffer(self, buffer):
@@ -122,7 +121,7 @@ class Server(Cmd):
             try:
                 buffer = b""
                 chunk = connection.recv(1024)
-                log_msg("__user_thread", f"chunk: {chunk}")
+                #log_msg("__user_thread", f"chunk: {chunk}")
 
                 if chunk == b"" and self.__connections[user_id]:
                     # user still connected, disconnect them
@@ -137,7 +136,7 @@ class Server(Cmd):
                     break
 
                 buffer = self.decode_buffer(buffer)
-                log_msg("__user_thread", f"buffer: {buffer}")
+                #log_msg("__user_thread", f"buffer: {buffer}")
 
                 objects = self.separateJson(buffer)
 
@@ -226,11 +225,17 @@ class Server(Cmd):
                     break
             except Exception as e:
                 try:
-                    log_msg("__waitForLogin", f"Error: {e}")
+                    log_msg("__waitForLogin","Connection closed", f"Error 1: {e}")
+                    # send a 404 error to TorBrowser
+                    connection.send("HTTP/1.1 404 Not Found\r".encode())
                     connection.close()
                     break
+
                 except Exception as e:
-                    log_msg("__waitForLogin", f"Error: {e}")
+                    log_msg("__waitForLogin","Connection closed", f"Error 2: {e}")
+                    # send a 404 error to TorBrowser
+                    connection.send("HTTP/1.1 404 Not Found\r".encode())
+                    connection.close()
                     break
 
     def delete_private_key(self):
