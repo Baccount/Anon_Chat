@@ -82,26 +82,3 @@ class CreateOnion():
 
     def get_port(self):
         return self.port
-
-
-    def run_server(self):
-        # TODO: create a flask server and run it
-        
-        
-        
-        
-        
-        onion = self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
-        print("[Server] server is running......")
-        print(f"Onion Service: {self.g(onion.service_id)}" + self.g(".onion"))
-        port = self.get_port()
-        from flask import Flask
-        app = Flask(__name__)
-        @app.route('/')
-        def hello_world():
-            return 'Hello, World!'
-        app.run(port=port, host="127.0.0.1")
-
-    def g(self, text):
-    # return green text
-        return "\033[92m" + text + "\033[0m"

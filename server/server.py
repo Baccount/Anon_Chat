@@ -7,6 +7,9 @@ from logging_msg import log_msg
 
 from .server_tor import CreateOnion
 
+from .onion_server import OnionServer
+from .flask_server import start
+
 
 class Server(Cmd):
     """
@@ -260,7 +263,13 @@ class Server(Cmd):
                 self.delete_private_key()
                 self.start()
             elif choice == "4":
-                self.tor.run_server()
+                # start onion server
+                onion_server = OnionServer()
+                onion_server.start()
+                port = onion_server.get_port()
+                # TODO start flask server
+                start(port)
+                
             else:
                 print("Invalid choice")
                 self.start()
