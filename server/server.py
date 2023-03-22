@@ -226,11 +226,17 @@ class Server(Cmd):
                     break
             except Exception as e:
                 try:
-                    log_msg("__waitForLogin", f"Error: {e}")
+                    log_msg("__waitForLogin","Connection closed", f"Error 1: {e}")
+                    # send a 404 error to TorBrowser
+                    connection.send("HTTP/1.1 404 Not Found\r".encode())
                     connection.close()
                     break
+
                 except Exception as e:
-                    log_msg("__waitForLogin", f"Error: {e}")
+                    log_msg("__waitForLogin","Connection closed", f"Error 2: {e}")
+                    # send a 404 error to TorBrowser
+                    connection.send("HTTP/1.1 404 Not Found\r".encode())
+                    connection.close()
                     break
 
     def delete_private_key(self):
