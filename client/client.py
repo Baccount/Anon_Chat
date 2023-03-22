@@ -3,7 +3,7 @@ import threading
 from cmd import Cmd
 
 from logging_msg import log_msg
-from scrips.scripts import decode
+from scrips.scripts import decode, g, r
 
 from .connect_tor import ConnectTor
 
@@ -80,7 +80,7 @@ class Client(Cmd):
         # start tor onion service
         if not self.tor.connect_onion(onion):
             # Onion service not found, ask user to try again
-            print(self.red("Onion service not found, please try again"))
+            print(r("Onion service not found, please try again"))
             self.start()
         self.cmdloop()
 
@@ -176,13 +176,9 @@ class Client(Cmd):
         print("h - show help menu")
         print("q - quit the chat room")
 
-    def g(self, text):
-        # return green text
-        return "\033[92m" + text + "\033[0m"
-
     def do_o(self, args):
         # print the onion address
-        onion = self.g(self.onion_address)
+        onion = g(self.onion_address)
         print(f"{onion}")
 
     def do_quit(self, args=None):
@@ -193,6 +189,3 @@ class Client(Cmd):
         exit(0)
         # exit without calling force kill tor for now
         # force_kill_tor()
-
-    def red(self, msg):
-        return f"\033[31m{msg}\033[0m"
