@@ -1,5 +1,5 @@
-import argparse
-from os import getcwd, path
+from argparse import ArgumentParser
+from os import getcwd, path, remove
 
 
 from stem.process import launch_tor_with_config
@@ -10,7 +10,7 @@ from logging_msg import log_msg
 from scrips.scripts import saveBridges, print_bootstrap_lines, ascii_client, force_kill_tor
 
 # Create an ArgumentParser object
-parser = argparse.ArgumentParser()
+parser = ArgumentParser()
 
 # Add an argument to specify a boolean value
 parser.add_argument(
@@ -80,19 +80,33 @@ class ClientServer:
             # we are not testing
             # ask if we want to use bridges or if they want to use their own
             choice = input(
-                "1. Get Bridges online \n2. Use your own bridges\n3. Default Tor Connection\n:"
+                "1. Get Bridges online \n2. Use your own bridges\n3. Delete local bridges\n4. Default Tor Connection\n:"
             )
 
             if choice == "1":
                 self.use_bridges()
             elif choice == "2":
                 self.use_own_bridges()
+            elif choice == "3":
+                self.delete_bridges()
+                self.choose_bridges()
             else:
                 # use default tor config
                 pass
             # if the user enters something else use default tor config
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")
+
+    def delete_bridges(self):
+        if path.exists("bridges.json"):
+            log_msg("StartServer", "delete_bridges", "Deleting bridges.json")
+            try:
+                remove("bridges.json")
+            except Exception as e:
+                log_msg("StartServer", "delete_bridges", f"Error: {e}")
+        else:
+            log_msg("StartServer", "delete_bridges", "No bridges.json to delete")
+
 
     def use_own_bridges(self):
         if not path.exists("bridges.json"):

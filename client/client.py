@@ -1,9 +1,9 @@
-import json
-import threading
+from json import dumps, loads
+from threading import Thread
 from cmd import Cmd
 
 from logging_msg import log_msg
-from scrips.scripts import decode
+from scrips.scripts import decode, g, r
 
 from .connect_tor import ConnectTor
 
@@ -43,7 +43,7 @@ class Client(Cmd):
                     self.start()
 
                 for i in decoded:
-                    obj = json.loads(i)
+                    obj = loads(i)
                     print("[" + str(obj["sender_nickname"]) + "]", obj["message"])
             except Exception as e:
                 log_msg("__receive_message_thread", "Exception ", e)
@@ -58,7 +58,7 @@ class Client(Cmd):
         """
         try:
             self.tor.socket.send(
-                json.dumps(
+                dumps(
                     {"type": "broadcast", "sender_id": self.__id, "message": message}
                 ).encode()
             )
@@ -80,7 +80,7 @@ class Client(Cmd):
         # start tor onion service
         if not self.tor.connect_onion(onion):
             # Onion service not found, ask user to try again
-            print(self.red("Onion service not found, please try again"))
+            print(r("Onion service not found, please try again"))
             self.start()
         self.cmdloop()
 
@@ -96,13 +96,13 @@ class Client(Cmd):
         if not self.__isLogin:
             # Send the nickname to the server to get the user id
             self.tor.socket.send(
-                json.dumps({"type": "login", "nickname": nickname}).encode()
+                dumps({"type": "login", "nickname": nickname}).encode()
             )
 
             try:
                 buffer = self.tor.socket.recv(1024).decode()
                 log_msg("Client", "do_login", f"buffer{buffer}")
-                obj = json.loads(buffer)
+                obj = loads(buffer)
                 if obj["id"]:
                     
                     # if id = -1 means the nickname is already in use
@@ -122,7 +122,7 @@ class Client(Cmd):
                     print("Successfully logged into the chat room")
                     log_msg("Client", "do_login", "Successfully logged into the chat room")
 
-                    thread = threading.Thread(target=self.__receive_message_thread)
+                    thread = Thread(target=self.__receive_message_thread)
                     thread.setDaemon(True)
                     thread.start()
             except Exception as e:
@@ -145,7 +145,7 @@ class Client(Cmd):
             # Show messages sent by yourself
             print("[" + str(self.__nickname) + "]", message)
             # Open child thread for sending data
-            thread = threading.Thread(
+            thread = Thread(
                 target=self.__send_message_thread, args=(message,)
             )
             thread.setDaemon(True)
@@ -159,7 +159,7 @@ class Client(Cmd):
         Logout from the chat room.
         """
         self.tor.socket.send(
-            json.dumps({"type": "logout", "sender_id": self.__id}).encode()
+            dumps({"type": "logout", "sender_id": self.__id}).encode()
         )
         self.__isLogin = False
         log_msg("do_logout", "You have logged out")
@@ -176,13 +176,9 @@ class Client(Cmd):
         print("h - show help menu")
         print("q - quit the chat room")
 
-    def g(self, text):
-        # return green text
-        return "\033[92m" + text + "\033[0m"
-
     def do_o(self, args):
         # print the onion address
-        onion = self.g(self.onion_address)
+        onion = g(self.onion_address)
         print(f"{onion}")
 
     def do_quit(self, args=None):
@@ -193,6 +189,3 @@ class Client(Cmd):
         exit(0)
         # exit without calling force kill tor for now
         # force_kill_tor()
-
-    def red(self, msg):
-        return f"\033[31m{msg}\033[0m"
