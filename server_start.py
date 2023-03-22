@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from os import getcwd, path
+from os import getcwd, path, remove
 
 from stem.process import launch_tor_with_config
 
