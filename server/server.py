@@ -6,6 +6,7 @@ from cmd import Cmd
 from logging_msg import log_msg
 
 from .server_tor import CreateOnion
+from scrips.scripts import g
 
 
 class Server(Cmd):
@@ -55,10 +56,6 @@ class Server(Cmd):
             self.__nicknames[user_id] = None
         except Exception as e:
             log_msg("disconnectUsr", f"Error: {e}")
-
-    def g(self, text):
-        # return green text
-        return "\033[92m" + text + "\033[0m"
 
     def separateJson(self, buffer):
         """
@@ -273,7 +270,7 @@ class Server(Cmd):
             response = self.tor.ephemeral_onion()
 
         print("[Server] server is running......")
-        print(f"Onion Service: {self.g(response.service_id)}" + self.g(".onion"))
+        print(f"Onion Service: {g(response.service_id)}" + g(".onion"))
         self.onion_address = response.service_id
 
         self.__connections.append(None)
@@ -295,7 +292,7 @@ class Server(Cmd):
 
     def do_o(self, args):
         # print the onion address
-        onion = self.g(self.onion_address) + self.g(".onion")
+        onion = g(self.onion_address) + g(".onion")
         print(f"{onion}")
 
     def do_ban(self, args):
