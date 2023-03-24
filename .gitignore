@@ -6,3 +6,4 @@
 .DS_Store
 server/private_key
 private_key
+bridges.json
