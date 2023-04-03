@@ -158,6 +158,6 @@ if __name__ == "__main__":
         server.start()
     except KeyboardInterrupt:
         print("\nExiting...")
-        # run the force kill tor function without creating a new instance of StartServer
+        # run the force kill tor function when the user presses ctrl+c
         force_kill_tor()
         exit(1)
