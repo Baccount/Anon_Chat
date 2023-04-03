@@ -68,8 +68,9 @@ class ClientServer:
             # tor is already running
             log_msg("ClientServer", "start", "Tor is already running")
             log_msg("ClientServer", "start", f"Error: {e}")
-        # Add some space
+
         print("\n" * 2)
+
         if not self.test:
             # start the client if not testing
             client = Client()
@@ -157,5 +158,6 @@ if __name__ == "__main__":
         client.start()
     except KeyboardInterrupt:
         print("\nExiting...")
+        # run the force kill tor function when the user presses ctrl+c
         force_kill_tor()
         exit(1)

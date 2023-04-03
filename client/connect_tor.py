@@ -36,6 +36,7 @@ class ConnectTor(object):
             self.socket = socket(AF_INET, SOCK_STREAM)
             log_msg("connect_tor", "connect_onion", "Reseting socket")
             return False
+
         if self.test:
             # were testing
             return True

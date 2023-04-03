@@ -60,6 +60,7 @@ class DownloadBridges:
             log_msg("getCaptcha", "getBridge", f"Transport: {self.transport}")
         except Exception as e:
             log_msg("DownloadBridges", "getBridge", f"Error: {e}")
+
         if self.test is True:
             # we are testing
             return True
@@ -72,6 +73,7 @@ class DownloadBridges:
             image.show()
         except Exception as e:
             log_msg("DownloadBridges", "display_image", f"Error: {e}")
+
         if self.test is True:
             # we are testing
             return True
@@ -153,6 +155,7 @@ class DownloadBridges:
         Cleanup the meek process
         """
         self.meek.cleanup()
+
         if self.test is True:
             # we are testing
             return True
@@ -163,6 +166,7 @@ class DownloadBridges:
         """
         log_msg("DownloadBridges", "saveBridges", "Saving bridges to bridges.json")
         bridge_lst = self.getBridges()
+
         with open("bridges.json", "w") as f:
             dump(bridge_lst, f)
 

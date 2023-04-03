@@ -163,6 +163,7 @@ class Client(Cmd):
         )
         self.__isLogin = False
         log_msg("do_logout", "You have logged out")
+
         return True
 
     def do_h(self, args=None):
@@ -187,5 +188,3 @@ class Client(Cmd):
         """
         self.do_logout()
         exit(0)
-        # exit without calling force kill tor for now
-        # force_kill_tor()

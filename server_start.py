@@ -66,14 +66,16 @@ class StartServer:
         except Exception as e:
             log_msg("StartServer", "start", "Tor is already running")
             log_msg("StartServer", "start", f"Error: {e}")
-        # Add some space
+
         print("\n" * 2)
         # start the server if we are Not testing
         log_msg("StartServer", f" Are we using pytest: {self.test}")
+
         if self.test is False:
             # if test_enabled == True, use ephemeral by default
             server = Server(test_enabled)
             server.start()
+
         if self.test:
             # we are testing
             return True
@@ -96,6 +98,7 @@ class StartServer:
             else:
                 # use default tor config
                 pass
+
             # if the user enters something else use default tor config
             log_msg("StartServer", "SocksPort", f"{self.tor_cfg['SocksPort']}")
             log_msg("StartServer", "ControlPort", f"{self.tor_cfg['ControlPort']}")

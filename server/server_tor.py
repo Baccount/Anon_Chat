@@ -24,6 +24,7 @@ class CreateOnion():
             self.controller.authenticate()
             self.socket.bind(("127.0.0.1", self.port))
             self.socket.listen(10)
+
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
             force_kill_tor()
@@ -44,7 +45,6 @@ class CreateOnion():
             log_msg("ephemeral_onion", "Creating ephemeral hidden service on port 80")
             return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
         except ProtocolError as e:
-            # kill tor subprocess
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
             force_kill_tor()
             # call the function again
@@ -55,7 +55,7 @@ class CreateOnion():
         '''
         create non-ephemeral hidden services using a private key
         '''
-        # set key path as the current directory
+
         try:
             key_path = path.join(path.dirname(__file__), 'private_key')
             log_msg("non_ephemeral_onion", "Creating non-ephemeral hidden service on port 80")
@@ -69,8 +69,8 @@ class CreateOnion():
                     key_type, key_content = key_file.read().split(':', 1)
                     log_msg("non_ephemeral_onion", f"Using existing private key {key_content}")
                 response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type=key_type, key_content=key_content, await_publication = True)
+
         except ProtocolError as e:
-            # kill tor subprocess
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
             force_kill_tor()
             # call the function again

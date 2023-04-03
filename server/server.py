@@ -279,6 +279,7 @@ class Server(Cmd):
         cmdThread = Thread(target=self.cmdloop)
         cmdThread.setDaemon(True)
         cmdThread.start()
+
         while True:
             connection, address = self.tor.socket.accept()
             log_msg(
@@ -310,6 +311,7 @@ class Server(Cmd):
                 )
                 return
             self.ban_user(user_id=int(args))
+
         except Exception as e:
             print("server line 38")
             print(e)
