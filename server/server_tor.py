@@ -6,13 +6,6 @@ from scrips.scripts import force_kill_tor
 from os import path
 
 
-class BundledTorCanceled(Exception):
-    """
-    This exception is raised if onionshare is set to use the bundled Tor binary,
-    and the user cancels connecting to Tor
-    """
-
-
 class CreateOnion():
 
     def __init__(self):
