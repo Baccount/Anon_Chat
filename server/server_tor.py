@@ -1,7 +1,6 @@
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from stem.control import Controller
 from logging_msg import log_msg
-from stem import ProtocolError
 from scrips.scripts import force_kill_tor
 from os import path
 
@@ -37,7 +36,7 @@ class CreateOnion():
         try:
             log_msg("ephemeral_onion", "Creating ephemeral hidden service on port 80")
             return self.controller.create_ephemeral_hidden_service({80: self.port}, await_publication = True)
-        except ProtocolError as e:
+        except Exception as e:
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
             force_kill_tor()
             # call the function again
@@ -63,9 +62,11 @@ class CreateOnion():
                     log_msg("non_ephemeral_onion", f"Using existing private key {key_content}")
                 response = self.controller.create_ephemeral_hidden_service({80: self.port}, key_type=key_type, key_content=key_content, await_publication = True)
 
-        except ProtocolError as e:
+
+        except Exception as e:
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
+            log_msg("CreateOnion", "non_ephemeral_onion", "Try to delete the private_key file and restart the program")
             force_kill_tor()
-            # call the function again
-            self.non_ephemeral_onion()
+            # exit the program
+            exit(1)
         return response
