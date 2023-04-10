@@ -269,6 +269,11 @@ class Server(Cmd):
             # we are testing, so use the ephemeral onion
             response = self.tor.ephemeral_onion()
 
+        # hidden service failed to start reask for user input
+        if response is None:
+            print("Hidden service failed to start")
+            self.start()
+
         print("[Server] server is running......")
         print(f"Onion Service: {g(response.service_id)}" + g(".onion"))
         self.onion_address = response.service_id

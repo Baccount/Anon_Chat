@@ -66,7 +66,6 @@ class CreateOnion():
         except Exception as e:
             log_msg("CreateOnion", "non_ephemeral_onion", f"Error: {e}")
             log_msg("CreateOnion", "non_ephemeral_onion", "Try to delete the private_key file and restart the program")
-            force_kill_tor()
-            # exit the program
-            exit(1)
+            # error state return None
+            return None
         return response
