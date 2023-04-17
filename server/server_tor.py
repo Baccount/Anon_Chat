@@ -15,6 +15,7 @@ class CreateOnion():
             self.controller = Controller.from_port(port=9051)
             self.controller.authenticate()
             self.socket.bind(("127.0.0.1", self.port))
+            # (10) represents the maximum number of queued connections.
             self.socket.listen(10)
 
         except Exception as e:
