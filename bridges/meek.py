@@ -58,7 +58,7 @@ class Meek():
         if self.meek_path is None or not os.path.exists(
             self.meek_path
         ):
-            raise MeekNotFound(self.common)
+            log_msg("Meek", "start", "Meek binary not found")
 
 
         self.meek_proc = subprocess.Popen(
@@ -76,6 +76,7 @@ class Meek():
             # Using universal_newlines instead of text because the snap package using python < 3.7
             universal_newlines=True,
         )
+        log_msg("Meek", "start", "Started meek-client process")
 
         # Obtain the host and port that meek is running on
         for line in iter(self.meek_proc.stdout.readline, b""):
@@ -98,6 +99,7 @@ class Meek():
         else:
             self.cleanup()
             raise MeekNotRunning(self.common, "Could not obtain the meek port")
+        log_msg("Meek", "start", self.meek_proxies)
         return self.meek_proxies
 
     def cleanup(self):
