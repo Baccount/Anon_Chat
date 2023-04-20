@@ -1,8 +1,7 @@
 from json import dump
+from subprocess import PIPE, Popen, run
+
 from logging_msg import log_msg
-from subprocess import Popen, PIPE, run
-
-
 
 
 def saveBridges(bridge_lst):
@@ -13,6 +12,7 @@ def saveBridges(bridge_lst):
     # write the bridges from the file
     with open("bridges.json", "w") as f:
         dump(bridge_lst, f)
+
 
 def ascii_client():
     print(
@@ -42,6 +42,7 @@ def server_ascii():
         """
     )
 
+
 def force_kill_tor():
     """
     Force kill the tor process
@@ -63,6 +64,7 @@ def force_kill_tor():
             print("No process named tor found.")
     except Exception as e:
         print(e)
+
 
 def decode(buffer):
     """
@@ -91,10 +93,12 @@ def decode(buffer):
 
 
 def g(*msg):
-    msg = ' '.join(map(str, msg))
+    # Maps each element of the 'msg' tuple to a string, then concatenates them into a single string, separated by spaces.
+    msg = " ".join(map(str, msg))
     return "\033[92m" + msg + "\033[0m"
 
-# support any number of arguments
+
 def r(*msg):
-    msg = ' '.join(map(str, msg))
+    # Maps each element of the 'msg' tuple to a string, then concatenates them into a single string, separated by spaces.
+    msg = " ".join(map(str, msg))
     return f"\033[31m{msg}\033[0m"
