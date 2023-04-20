@@ -97,10 +97,11 @@ def decode(buffer):
     return objects
 
 
-def g(text):
-    # return green text
-    return "\033[92m" + text + "\033[0m"
+def g(*msg):
+    msg = ' '.join(map(str, msg))
+    return "\033[92m" + msg + "\033[0m"
 
-def r(msg):
-    # return red text
+# support any number of arguments
+def r(*msg):
+    msg = ' '.join(map(str, msg))
     return f"\033[31m{msg}\033[0m"
