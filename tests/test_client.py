@@ -12,7 +12,7 @@ from client.client import Client
 from scrips.scripts import force_kill_tor, decode
 
 class TestClient:
-    def setup(self):
+    def setup_method(self):
         # start tor
         clientserver = ClientServer(test=True)
         clientserver.start()

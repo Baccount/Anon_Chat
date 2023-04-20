@@ -12,7 +12,7 @@ from bridges.downloadbridges import DownloadBridges
     getenv("GITHUB_ACTIONS") == "true", reason="Skipping test on GitHub Actions Because meek-client is not supported on GitHub Actions 'Linux does not support it'."
 )
 class TestDownloadBridges:
-    def setup(self):
+    def setup_method(self):
         self.db = DownloadBridges(protocol="obfs4", test=True)
         # test connect Meek
         assert self.db.connectMeek() is True
