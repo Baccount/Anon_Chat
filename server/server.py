@@ -6,7 +6,7 @@ from cmd import Cmd
 from logging_msg import log_msg
 
 from .server_tor import CreateOnion
-from scrips.scripts import g
+from scrips.scripts import g, r
 
 
 class Server(Cmd):
@@ -223,6 +223,7 @@ class Server(Cmd):
             except Exception as e:
                 try:
                     log_msg("__waitForLogin","Connection closed", f"Error 1: {e}")
+                    log_msg("__waitForLogin","Connection closed", r("Disconnecting TorBrowser"))
                     # send a 404 error to TorBrowser
                     connection.send("HTTP/1.1 404 Not Found\r".encode())
                     connection.close()
