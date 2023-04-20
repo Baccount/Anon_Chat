@@ -4,9 +4,9 @@ from os import getcwd, path, remove
 from stem.process import launch_tor_with_config
 
 from bridges.downloadbridges import DownloadBridges
-from logging_msg import log_msg
+from logging_msg import log_msg, print_bootstrap_lines
 from server.server import Server
-from scrips.scripts import saveBridges, print_bootstrap_lines, server_ascii, force_kill_tor
+from scrips.scripts import saveBridges, server_ascii, force_kill_tor
 
 # Create an ArgumentParser object
 parser = ArgumentParser()

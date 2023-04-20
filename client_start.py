@@ -6,8 +6,8 @@ from stem.process import launch_tor_with_config
 
 from bridges.downloadbridges import DownloadBridges
 from client.client import Client
-from logging_msg import log_msg
-from scrips.scripts import saveBridges, print_bootstrap_lines, ascii_client, force_kill_tor
+from logging_msg import log_msg, print_bootstrap_lines
+from scrips.scripts import saveBridges, ascii_client, force_kill_tor
 
 # Create an ArgumentParser object
 parser = ArgumentParser()
