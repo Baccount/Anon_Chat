@@ -17,3 +17,9 @@ def log_msg(module, func, msg=None):
                 f"{final_msg}{Fore.WHITE + Style.DIM}: {msg}{Style.RESET_ALL}"
             )
         print(final_msg)
+
+def print_bootstrap_lines(line):
+    if "Bootstrapped " in line and verbose:
+        # print the line and clear it
+        final_msg = f"{Fore.WHITE + Style.DIM}{line}{Style.RESET_ALL}"
+        print(final_msg, end="\r")
