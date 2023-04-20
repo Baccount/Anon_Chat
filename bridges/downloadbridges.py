@@ -107,7 +107,7 @@ class DownloadBridges:
                 log_msg(
                     r("DownloadBridges"),
                     r(
-                        "checkCaptcha", "Server Error: " + str(self.bridge.status_code)
+                        "checkCaptcha Server Error: " + str(self.bridge.status_code)
                     ),
                 )
                 return False
