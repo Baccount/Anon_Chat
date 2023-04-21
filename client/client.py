@@ -14,7 +14,7 @@ class Client(Cmd):
     """
 
     prompt = ""
-    intro = "Welcom to AnonChat \n"
+    intro = "Welcom to AnonChat \n\nType 'login <nickname>' to login\n"
 
     def __init__(self):
         """
