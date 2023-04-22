@@ -32,12 +32,17 @@ class ConnectTor(object):
             return True
         except Exception as e:
             log_msg("connect_tor", "connect_onion", f"Error: {e}")
-            # reset the socket
+
+            # Reset the socket by setting the default proxy and recreating the socket object
             setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
             socket = socksocket
             self.socket = socket(AF_INET, SOCK_STREAM)
+
             log_msg("connect_tor", "connect_onion", "Reseting socket")
+
+            # Return False as the connection attempt failed
             return False
+
 
         if self.test:
             # were testing
