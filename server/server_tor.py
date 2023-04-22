@@ -10,13 +10,14 @@ class CreateOnion():
     def __init__(self):
         try:
             self.socket = socket(AF_INET, SOCK_STREAM)
-            # get available port
             self.port = self.get_available_port()
             self.controller = Controller.from_port(port=9051)
             self.controller.authenticate()
+            # Bind the socket to the local host and the available port
             self.socket.bind(("127.0.0.1", self.port))
-            # (10) represents the maximum number of queued connections.
+            # Set the socket to listen for incoming connections with a backlog of 10
             self.socket.listen(10)
+
 
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
