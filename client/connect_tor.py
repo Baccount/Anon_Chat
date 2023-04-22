@@ -9,8 +9,10 @@ class ConnectTor(object):
     def __init__(self, test=False):
         self.test = test
         try:
+            # Set the default proxy to use SOCKS5 and connect to the local TOR service
             setdefaultproxy(PROXY_TYPE_SOCKS5, "127.0.0.1", 9050)
             socket = socksocket
+            # Create a new TCP socket for the onion service
             self.socket = socket(AF_INET, SOCK_STREAM)
         except Exception as e:
             log_msg("CreateOnion", "__init__", f"Error: {e}")
