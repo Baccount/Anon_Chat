@@ -5,9 +5,8 @@ sys.path.append('../')
 from server_start import StartServer
 
 
-
 class TestServer():
-# run tests for client
+
     def setup_method(self):
         self.server = StartServer(test=True)
 
