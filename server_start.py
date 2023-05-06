@@ -24,7 +24,7 @@ try:
     # Parse the arguments
     args = parser.parse_args()
 
-    # Store the boolean flag in a variable False by default
+
     test_enabled = False
     test_enabled = args.test_enabled
 except Exception as e:
