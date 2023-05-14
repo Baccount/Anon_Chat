@@ -24,7 +24,6 @@ try:
     # Parse the arguments
     args = parser.parse_args()
 
-
     test_enabled = False
     test_enabled = args.test_enabled
 except Exception as e:
