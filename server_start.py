@@ -35,7 +35,6 @@ obsf4 = getcwd() + "/tor/obfs4proxy"
 geo_ip_file = getcwd() + "/tor/geoip"
 geo_ipv6_file = getcwd() + "/tor/geoip6"
 
-
 class StartServer:
     def __init__(self, test=False):
         server_ascii()
