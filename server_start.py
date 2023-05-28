@@ -54,6 +54,7 @@ class StartServer:
         # start Tor with the new configuration if tor is not running
         log_msg("StartServer", "start", f"starting tor bin {tor_dir}")
         log_msg("StartServer", "config tor", f"{self.tor_cfg}")
+        log_msg("StartSerer", " If you're stuck at 0% visit http://127.0.0.1:9050/ in your normal webrowser.")
         try:
             self.tor_bin = launch_tor_with_config(
                 config=self.tor_cfg,
