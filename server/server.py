@@ -104,7 +104,7 @@ class Server(Cmd):
 
     def __user_thread(self, user_id):
         """
-        user thread
+        User thread
         :param user_id: user id
         """
         connection = self.__connections[user_id]
@@ -157,7 +157,8 @@ class Server(Cmd):
 
     def __broadcast(self, user_id=0, message=""):
         """
-        broadcast
+        Broadcast a message to all users in the chat room.
+        
         :param user_id: user id (0 is the system)
         :param message: broadcast content
         """
